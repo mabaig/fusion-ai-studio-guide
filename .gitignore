@@ -1,0 +1,15 @@
+# macOS
+.DS_Store
+
+# Source captures used to build the guide's figures. The published, scrubbed
+# and compressed versions live in docs/images/ — these originals are not
+# meant to be public. Remove these two lines if you want them versioned.
+Screenshot*.png
+new_screenshots/
+
+# Local pre-compression snapshot of the guide (PNG originals). Not published.
+blog copy/
+
+# Personal publishing notes — drafts for Medium/LinkedIn and the runbook.
+# Kept locally on purpose; not part of the public guide.
+publishing/

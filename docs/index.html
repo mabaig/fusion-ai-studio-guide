@@ -1,0 +1,1759 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Fusion Agentic Apps from the Terminal</title>
+<meta name="description" content="A step-by-step guide to the Oracle AI Agent Studio CLI running inside Claude Code, for Oracle Fusion release 26C.">
+<meta name="author" content="Baig Mohammed">
+<meta name="theme-color" content="#11131A" media="(prefers-color-scheme:dark)">
+<meta name="theme-color" content="#FCFCFD" media="(prefers-color-scheme:light)">
+
+<link rel="canonical" href="https://mabaig.github.io/fusion-ai-studio-guide">
+<meta property="og:type" content="article">
+<meta property="article:author" content="https://github.com/mabaig">
+<meta property="og:site_name" content="Oracle AI Agent Studio CLI + Claude Code">
+<meta property="og:title" content="I built a Fusion agentic app by typing one paragraph">
+<meta property="og:description" content="Oracle put its own AI Agent Studio expertise in a public repo. Every step of driving it from Claude Code, including the one Oracle's guide leaves out.">
+<meta property="og:url" content="https://mabaig.github.io/fusion-ai-studio-guide">
+<meta property="og:image" content="https://mabaig.github.io/fusion-ai-studio-guide/social/og-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="I built a Fusion agentic app by typing one paragraph — and the five rules: spec first, one gated write, discover first, fixed structure, checks pass.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="I built a Fusion agentic app by typing one paragraph">
+<meta name="twitter:description" content="Every step of driving the Oracle AI Agent Studio CLI from Claude Code, for Fusion release 26C.">
+<meta name="twitter:image" content="https://mabaig.github.io/fusion-ai-studio-guide/social/og-card.png">
+
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle",
+ "headline":"I built a Fusion agentic app by typing one paragraph",
+ "description":"A step-by-step guide to the Oracle AI Agent Studio CLI running inside Claude Code, for Oracle Fusion release 26C.",
+ "author":{"@type":"Person","name":"Baig Mohammed","url":"https://github.com/mabaig"},
+ "image":"https://mabaig.github.io/fusion-ai-studio-guide/social/og-card.png",
+ "mainEntityOfPage":"https://mabaig.github.io/fusion-ai-studio-guide/",
+ "about":["Oracle Fusion","Oracle AI Agent Studio","Claude Code"]}
+</script>
+<style>
+/* ─── tokens ─────────────────────────────────────────────────────────── */
+:root{
+  --ground:#FCFCFD;
+  --surface:#F1F2F5;
+  --surface-2:#E8EAEF;
+  --ink:#15171C;
+  --ink-2:#3D434F;
+  --muted:#5A606E;
+  --rule:#DFE1E7;
+  --rule-strong:#C6CAD3;
+  --accent:#9C6A12;
+  --accent-soft:#FBF3DF;
+  --mark:#F0B429;
+  --ok:#1E7A4C;
+  --warn:#A05C0E;
+  --crit:#B22A22;
+  /* the code panel stays a terminal in both themes */
+  --code-bg:#1A1D24;
+  --code-ink:#E4E7EC;
+  --code-rule:#31363F;
+  --code-dim:#8C94A3;
+  --code-str:#E7C77A;
+  --code-kw:#8FC7F0;
+
+  --measure:68ch;
+  --rail:16.5rem;
+
+  --display:"Helvetica Neue",Helvetica,Arial,"Segoe UI",system-ui,sans-serif;
+  --body:Charter,"Bitstream Charter","Sitka Text",Cambria,Georgia,"Times New Roman",serif;
+  --mono:ui-monospace,"SF Mono","Cascadia Mono","Roboto Mono",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --ground:#11131A;
+    --surface:#181B22;
+    --surface-2:#1F232B;
+    --ink:#E9EBF0;
+    --ink-2:#C3C8D2;
+    --muted:#98A0AD;
+    --rule:#282C36;
+    --rule-strong:#3A404C;
+    --accent:#F0B429;
+    --accent-soft:#2A2415;
+    --mark:#F0B429;
+    --ok:#4FBE86;
+    --warn:#DFA243;
+    --crit:#E8776B;
+    --code-bg:#0C0E13;
+    --code-rule:#262B34;
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#11131A;
+  --surface:#181B22;
+  --surface-2:#1F232B;
+  --ink:#E9EBF0;
+  --ink-2:#C3C8D2;
+  --muted:#98A0AD;
+  --rule:#282C36;
+  --rule-strong:#3A404C;
+  --accent:#F0B429;
+  --accent-soft:#2A2415;
+  --mark:#F0B429;
+  --ok:#4FBE86;
+  --warn:#DFA243;
+  --crit:#E8776B;
+  --code-bg:#0C0E13;
+  --code-rule:#262B34;
+}
+
+/* ─── base ───────────────────────────────────────────────────────────── */
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{animation:none!important;transition:none!important}}
+body{
+  margin:0;
+  background:var(--ground);
+  color:var(--ink);
+  font-family:var(--body);
+  font-size:1.0625rem;
+  line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+a{color:var(--accent);text-decoration:none;border-bottom:1px solid color-mix(in srgb,var(--accent) 40%,transparent)}
+a:hover{border-bottom-color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:2px}
+
+/* ─── shell ──────────────────────────────────────────────────────────── */
+.shell{display:grid;grid-template-columns:var(--rail) minmax(0,1fr);gap:0;max-width:96rem;margin:0 auto}
+main{min-width:0;padding:0 clamp(1.25rem,4vw,4rem) 8rem}
+.wrap{max-width:60rem;margin:0 auto}
+
+/* ─── rail ───────────────────────────────────────────────────────────── */
+.rail{
+  position:sticky;top:0;align-self:start;height:100vh;overflow-y:auto;
+  border-right:1px solid var(--rule);
+  padding:2.25rem 1.5rem 3rem;
+  font-family:var(--mono);
+}
+.rail-mark{
+  font-size:.6875rem;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--muted);margin:0 0 1.75rem;line-height:1.5;
+}
+.rail-mark b{display:block;color:var(--ink);letter-spacing:.1em}
+.rail nav ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.1rem}
+.rail nav a{
+  display:grid;grid-template-columns:1.9rem 1fr;gap:.35rem;
+  padding:.42rem .5rem;border:0;border-radius:3px;
+  font-size:.78125rem;line-height:1.35;color:var(--muted);
+}
+.rail nav a:hover{background:var(--surface);color:var(--ink)}
+.rail nav a .n{color:var(--rule-strong);font-variant-numeric:tabular-nums}
+.rail nav a.on{background:var(--accent-soft);color:var(--ink)}
+.rail nav a.on .n{color:var(--accent)}
+.rail-foot{margin-top:2rem;padding-top:1.25rem;border-top:1px solid var(--rule);
+  font-size:.6875rem;line-height:1.7;color:var(--muted)}
+.rail-foot a{border:0;color:var(--muted);text-decoration:underline;text-decoration-color:var(--rule-strong)}
+.rail-foot a:hover{color:var(--accent)}
+
+/* ─── masthead ───────────────────────────────────────────────────────── */
+.masthead{padding:5rem 0 3rem;border-bottom:1px solid var(--rule)}
+.eyebrow{
+  font-family:var(--mono);font-size:.6875rem;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--accent);margin:0 0 1.5rem;display:flex;flex-wrap:wrap;gap:.5rem .9rem;align-items:center;
+}
+.eyebrow span:not(:last-child)::after{content:"／";color:var(--rule-strong);margin-left:.9rem}
+h1{
+  font-family:var(--display);font-weight:700;letter-spacing:-.028em;text-wrap:balance;
+  font-size:clamp(2.4rem,6.2vw,4.1rem);line-height:1.02;margin:0 0 1.5rem;
+}
+.dek{font-size:clamp(1.15rem,2vw,1.4rem);line-height:1.5;color:var(--ink-2);margin:0;max-width:44ch;text-wrap:pretty}
+.byline{
+  margin-top:2.5rem;font-family:var(--mono);font-size:.75rem;color:var(--muted);
+  display:flex;flex-wrap:wrap;gap:.4rem 1.25rem;align-items:baseline;
+}
+.byline .who{
+  font-family:var(--display);font-size:.9375rem;font-weight:700;letter-spacing:-.01em;
+  color:var(--ink);
+}
+.byline .who a{color:var(--ink);border-bottom-color:color-mix(in srgb,var(--accent) 55%,transparent)}
+.byline .who a:hover{color:var(--accent)}
+
+/* ─── page footer ────────────────────────────────────────────────────── */
+.pagefoot{
+  margin-top:4rem;padding-top:1.75rem;border-top:1px solid var(--rule-strong);
+  display:grid;grid-template-columns:minmax(0,1fr) auto;gap:1.5rem 2rem;align-items:start;
+}
+.pagefoot .who{font-family:var(--display);font-size:1.0625rem;font-weight:700;letter-spacing:-.012em;margin:0 0 .35rem}
+.pagefoot .role{font-family:var(--mono);font-size:.75rem;color:var(--muted);margin:0 0 .6rem;line-height:1.6}
+.pagefoot .said{font-size:.9375rem;color:var(--ink-2);margin:0;max-width:52ch}
+.pagefoot .fl{font-family:var(--mono);font-size:.75rem;color:var(--muted);text-align:right;line-height:2}
+.pagefoot .fl a{display:block;border:0;color:var(--muted);text-decoration:underline;text-decoration-color:var(--rule-strong)}
+.pagefoot .fl a:hover{color:var(--accent)}
+@media (max-width:52rem){
+  .pagefoot{grid-template-columns:1fr}
+  .pagefoot .fl{text-align:left}
+}
+
+/* ─── sections & type ────────────────────────────────────────────────── */
+section{padding:4rem 0 0}
+h2{
+  font-family:var(--display);font-weight:700;letter-spacing:-.022em;text-wrap:balance;
+  font-size:clamp(1.65rem,3.2vw,2.35rem);line-height:1.1;margin:0 0 1.5rem;
+  display:grid;grid-template-columns:auto 1fr;gap:1rem;align-items:baseline;
+}
+h2 .sn{
+  font-family:var(--mono);font-size:.8125rem;font-weight:400;letter-spacing:.06em;
+  color:var(--accent);border:1px solid var(--rule-strong);border-radius:3px;
+  padding:.2rem .42rem;line-height:1;transform:translateY(-.35em);
+}
+h3{
+  font-family:var(--display);font-weight:700;letter-spacing:-.014em;text-wrap:balance;
+  font-size:1.3125rem;line-height:1.25;margin:2.75rem 0 .9rem;
+}
+h4{
+  font-family:var(--mono);font-weight:600;font-size:.75rem;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--muted);margin:2.25rem 0 .75rem;
+}
+p{margin:0 0 1.15rem;max-width:var(--measure);text-wrap:pretty}
+.lede{font-size:1.1875rem;line-height:1.55;color:var(--ink-2)}
+ul,ol{max-width:var(--measure);margin:0 0 1.15rem;padding-left:1.35rem}
+li{margin:0 0 .45rem}
+li::marker{color:var(--rule-strong)}
+strong{font-weight:600;color:var(--ink)}
+em{font-style:italic}
+hr{border:0;border-top:1px solid var(--rule);margin:3.5rem 0 0}
+code{
+  font-family:var(--mono);font-size:.86em;
+  background:var(--surface);border:1px solid var(--rule);border-radius:3px;
+  padding:.08em .32em;white-space:nowrap;
+}
+.q{color:var(--ink-2);font-style:italic}
+
+/* ─── step header ────────────────────────────────────────────────────── */
+.step{
+  display:grid;grid-template-columns:auto 1fr;gap:1.1rem;align-items:center;
+  margin:3.25rem 0 1.25rem;padding-top:1.5rem;border-top:1px solid var(--rule);
+}
+.step:first-of-type{border-top:0;padding-top:0}
+.step .num{
+  font-family:var(--mono);font-size:1rem;font-weight:600;font-variant-numeric:tabular-nums;
+  width:2.35rem;height:2.35rem;display:grid;place-items:center;
+  border:1px solid var(--accent);color:var(--accent);border-radius:3px;
+}
+.step h3{margin:0}
+
+/* ─── code ───────────────────────────────────────────────────────────── */
+.code{
+  position:relative;margin:0 0 1.5rem;
+  background:var(--code-bg);border:1px solid var(--code-rule);border-radius:5px;
+}
+.code-bar{
+  display:flex;justify-content:space-between;align-items:center;gap:1rem;
+  padding:.5rem .5rem .5rem .85rem;border-bottom:1px solid var(--code-rule);
+}
+.code-bar .lbl{
+  font-family:var(--mono);font-size:.6875rem;letter-spacing:.12em;text-transform:uppercase;color:var(--code-dim);
+}
+.copy{
+  font-family:var(--mono);font-size:.6875rem;letter-spacing:.06em;
+  background:transparent;color:var(--code-dim);
+  border:1px solid var(--code-rule);border-radius:3px;
+  padding:.28rem .55rem;cursor:pointer;
+}
+.copy:hover{color:var(--code-ink);border-color:var(--code-dim)}
+.copy[data-done="1"]{color:var(--mark);border-color:var(--mark)}
+.code pre{
+  margin:0;padding:.95rem 1rem 1.05rem;overflow-x:auto;
+  font-family:var(--mono);font-size:.8125rem;line-height:1.7;color:var(--code-ink);
+}
+.code pre code{background:0;border:0;padding:0;white-space:pre;font-size:1em}
+.code .c{color:var(--code-dim)}
+.code .k{color:var(--code-kw)}
+.code .s{color:var(--code-str)}
+
+/* ─── tables ─────────────────────────────────────────────────────────── */
+.tbl{overflow-x:auto;margin:0 0 1.75rem;border:1px solid var(--rule);border-radius:5px}
+table{border-collapse:collapse;width:100%;min-width:34rem;font-size:.875rem;line-height:1.5}
+thead th{
+  text-align:left;font-family:var(--mono);font-weight:600;
+  font-size:.6875rem;letter-spacing:.11em;text-transform:uppercase;color:var(--muted);
+  background:var(--surface);padding:.65rem .85rem;border-bottom:1px solid var(--rule-strong);
+  white-space:nowrap;
+}
+tbody td{padding:.65rem .85rem;border-bottom:1px solid var(--rule);vertical-align:top}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:hover td{background:var(--surface)}
+td code{white-space:nowrap}
+.num-col{font-family:var(--mono);font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
+.mono-col{font-family:var(--mono);font-size:.8125rem;white-space:nowrap}
+
+/* ─── pills ──────────────────────────────────────────────────────────── */
+.pill{
+  display:inline-block;font-family:var(--mono);font-size:.6875rem;letter-spacing:.05em;
+  padding:.12rem .4rem;border-radius:3px;border:1px solid;white-space:nowrap;
+}
+.pill-ok{color:var(--ok);border-color:color-mix(in srgb,var(--ok) 45%,transparent);background:color-mix(in srgb,var(--ok) 9%,transparent)}
+.pill-warn{color:var(--warn);border-color:color-mix(in srgb,var(--warn) 45%,transparent);background:color-mix(in srgb,var(--warn) 10%,transparent)}
+.pill-crit{color:var(--crit);border-color:color-mix(in srgb,var(--crit) 45%,transparent);background:color-mix(in srgb,var(--crit) 9%,transparent)}
+
+/* ─── the five rules ─────────────────────────────────────────────────── */
+.rules{margin:2rem 0 2.5rem;border-top:1px solid var(--rule-strong)}
+.rule-row{
+  display:grid;grid-template-columns:4.5rem 1fr;gap:1.5rem;
+  padding:1.5rem 0;border-bottom:1px solid var(--rule);align-items:start;
+}
+.rule-row .rn{
+  font-family:var(--mono);font-size:2.35rem;font-weight:600;line-height:.85;
+  color:var(--accent);font-variant-numeric:tabular-nums;letter-spacing:-.04em;
+}
+.rule-row h3{
+  font-family:var(--display);font-size:1.375rem;letter-spacing:-.018em;margin:0 0 .5rem;line-height:1.15;
+}
+.rule-row p{margin:0 0 .6rem;font-size:1rem;max-width:56ch}
+.rule-row p:last-child{margin:0}
+.rule-row .home{
+  font-family:var(--mono);font-size:.78125rem;line-height:1.55;color:var(--muted);
+  border-left:2px solid var(--rule-strong);padding-left:.75rem;max-width:52ch;
+}
+
+/* ─── callouts ───────────────────────────────────────────────────────── */
+.note{
+  margin:0 0 1.75rem;padding:1rem 1.15rem;border-radius:5px;
+  border:1px solid var(--rule);border-left:3px solid var(--rule-strong);
+  background:var(--surface);max-width:var(--measure);
+}
+.note.key{border-left-color:var(--mark);background:var(--accent-soft)}
+.note.stop{border-left-color:var(--crit)}
+.note h4{margin:0 0 .4rem}
+.note.key h4{color:var(--accent)}
+.note.stop h4{color:var(--crit)}
+.note p{margin:0 0 .6rem;font-size:.9375rem;max-width:62ch}
+.note p:last-child{margin:0}
+.note ul{margin:.4rem 0 0;font-size:.9375rem}
+
+/* ─── figures ────────────────────────────────────────────────────────── */
+figure{margin:0 0 2rem}
+figure img{
+  display:block;width:100%;height:auto;
+  border:1px solid var(--rule-strong);border-radius:5px;background:var(--surface);
+}
+figcaption{
+  font-family:var(--mono);font-size:.71875rem;line-height:1.5;color:var(--muted);
+  margin-top:.6rem;display:grid;grid-template-columns:auto 1fr;gap:.55rem;
+}
+figcaption .fn{color:var(--accent);white-space:nowrap}
+
+/* ─── two-up cards ───────────────────────────────────────────────────── */
+.duo{display:grid;grid-template-columns:repeat(auto-fit,minmax(19rem,1fr));gap:1.25rem;margin:0 0 2rem}
+.card{
+  border:1px solid var(--rule);border-radius:5px;padding:1.15rem 1.25rem;background:var(--surface);
+}
+.card h4{margin:0 0 .55rem;color:var(--accent)}
+.card p{margin:0;font-size:.9375rem;max-width:none}
+.card ul{margin:.5rem 0 0;font-size:.9375rem;max-width:none}
+
+/* ─── tree ───────────────────────────────────────────────────────────── */
+.tree{
+  font-family:var(--mono);font-size:.8125rem;line-height:1.75;
+  background:var(--surface);border:1px solid var(--rule);border-radius:5px;
+  padding:1rem 1.15rem;margin:0 0 1.75rem;overflow-x:auto;white-space:pre;color:var(--ink-2);
+}
+.tree b{color:var(--accent);font-weight:400}
+
+/* ─── responsive ─────────────────────────────────────────────────────── */
+@media (max-width:64rem){
+  .shell{grid-template-columns:1fr}
+  .rail{
+    position:static;height:auto;border-right:0;border-bottom:1px solid var(--rule);
+    padding:1.5rem clamp(1.25rem,4vw,2rem);
+  }
+  .rail nav ol{display:grid;grid-template-columns:repeat(auto-fill,minmax(13rem,1fr));gap:.1rem .75rem}
+  .rail-mark{margin-bottom:1rem}
+  .masthead{padding:3rem 0 2.25rem}
+}
+@media (max-width:34rem){
+  body{font-size:1rem}
+  h2{grid-template-columns:1fr;gap:.6rem}
+  h2 .sn{transform:none;justify-self:start}
+  .step{grid-template-columns:1fr;gap:.7rem}
+  .rule-row{grid-template-columns:1fr;gap:.5rem}
+  .rule-row .rn{font-size:1.75rem}
+}
+</style>
+
+<div class="shell">
+
+<aside class="rail">
+  <p class="rail-mark"><b>Fusion Agentic Apps</b>from the terminal<br>Oracle&nbsp;26C · Claude&nbsp;Code</p>
+  <nav aria-label="Contents">
+    <ol>
+      <li><a href="#what"><span class="n">01</span><span>What this actually is</span></a></li>
+      <li><a href="#who"><span class="n">02</span><span>Who this is for</span></a></li>
+      <li><a href="#rules"><span class="n">03</span><span>The five rules</span></a></li>
+      <li><a href="#before"><span class="n">04</span><span>Before you start</span></a></li>
+      <li><a href="#setup"><span class="n">05</span><span>Setup, steps 1&ndash;10</span></a></li>
+      <li><a href="#build"><span class="n">06</span><span>First build, steps 11&ndash;16</span></a></li>
+      <li><a href="#skills"><span class="n">07</span><span>Every skill explained</span></a></li>
+      <li><a href="#slash"><span class="n">08</span><span>Slash commands</span></a></li>
+      <li><a href="#cli"><span class="n">09</span><span>The CLI command map</span></a></li>
+      <li><a href="#apps"><span class="n">10</span><span>Agentic apps explained</span></a></li>
+      <li><a href="#trouble"><span class="n">11</span><span>What goes wrong</span></a></li>
+      <li><a href="#updates"><span class="n">12</span><span>Keeping it current</span></a></li>
+    </ol>
+  </nav>
+  <div class="rail-foot">
+    <p style="margin:0 0 .5rem">Tested against <code style="font-size:.9em">release-26C</code> · CLI <code style="font-size:.9em">1.0.1784919021375</code></p>
+    <p style="margin:0 0 .5rem"><a href="https://github.com/oracle/fusion-ai-studio">oracle/fusion-ai-studio</a></p>
+    <p style="margin:0">by <a href="https://github.com/mabaig">Baig Mohammed</a></p>
+  </div>
+</aside>
+
+<main>
+<div class="wrap">
+
+<header class="masthead">
+  <p class="eyebrow"><span>Oracle Fusion 26C</span><span>AI Agent Studio CLI</span><span>Claude Code</span></p>
+  <h1>I built a Fusion agentic app by typing one paragraph</h1>
+  <p class="dek">Oracle put its own AI Agent Studio expertise on GitHub as files a coding agent can read. Here is every step to use it.</p>
+  <p class="byline">
+    <span class="who">By <a href="https://github.com/mabaig">Baig Mohammed</a></span>
+    <span>Step-by-step guide</span><span>~40 minutes of setup</span><span>Works with no Fusion environment</span>
+  </p>
+</header>
+
+<!-- ═══ 01 ══════════════════════════════════════════════════════════ -->
+<section id="what">
+<h2><span class="sn">01</span><span>What this actually is</span></h2>
+
+<p class="lede">Oracle released something in <strong>26C</strong> that is easy to miss and hard to un-see once you get it.</p>
+
+<p>They put their own Fusion AI Agent Studio expertise into a public GitHub repo &mdash; as plain text files and a command-line tool. Any coding agent can read those files. Which means you can now describe a business outcome in a paragraph, and the agent will build the real Oracle app files for you.</p>
+
+<p>Not a mockup. Not a chatbot demo. Actual <code>.app</code> and <code>.wf</code> files that Oracle Fusion validates and runs.</p>
+
+<p>I ran the whole thing in <strong>Claude Code</strong>. This guide is every step, in order, with nothing skipped.</p>
+
+<figure>
+  <img src="images/11-repo-at-a-glance.webp" alt="Diagram of the oracle/fusion-ai-studio repository: release-26C contains aiapps with 167 sample artifacts across 16 Fusion modules, aistudio with the skill, the 288-command CLI and the VS Code extension, and how-to with Oracle's written guides.">
+  <figcaption><span class="fn">Fig. 1</span><span>The whole toolkit, and all of it under <code>release-26C</code>.</span></figcaption>
+</figure>
+
+<h3>The whole idea in two pictures</h3>
+
+<p>On your machine, a coding agent reads Oracle&rsquo;s expertise (written down as files) and uses Oracle&rsquo;s CLI to write app files:</p>
+
+<figure>
+  <img src="images/01-workspace-side.webp" alt="Diagram: inside your workspace a coding agent drives the aistudio skill and CLI, which write .app, .wf and .bo files — the only files Oracle accepts. Those files are then sent over to Oracle.">
+  <figcaption><span class="fn">Fig. 2</span><span>Your side. The agent produces the only three things Oracle accepts.</span></figcaption>
+</figure>
+
+<p>Then you send those files to Oracle, which checks every one of them before anything runs:</p>
+
+<figure>
+  <img src="images/02-oracle-side.webp" alt="Diagram: your files arrive at Oracle AI Agent Studio, which checks every one before it runs and rejects anything wrong. Oracle then builds the screens from its own approved parts for end users inside Fusion Applications. A dashed return arrow shows your agent looking up what exists, reading only and never changing.">
+  <figcaption><span class="fn">Fig. 3</span><span>Oracle&rsquo;s side. Files are rejected if anything is wrong; the only path back out is read-only.</span></figcaption>
+</figure>
+
+<div class="note key">
+  <h4>The boundary is the whole point</h4>
+  <p>The AI never builds the screens. It never invents a widget. It never talks to your database. It writes files. Oracle checks the files. Oracle builds the screens using its own approved parts. If a file is wrong, Oracle rejects it.</p>
+  <p>That single boundary is why this is safe enough to use on real HR and supply chain data.</p>
+</div>
+
+<h3>The four moving parts</h3>
+<div class="tbl"><table>
+<thead><tr><th>Part</th><th>What it is</th><th>Where it lives</th></tr></thead>
+<tbody>
+<tr><td><strong>The repo</strong></td><td>Oracle&rsquo;s public samples and tools</td><td class="mono-col">github.com/oracle/fusion-ai-studio</td></tr>
+<tr><td><strong>The skill</strong></td><td>Oracle&rsquo;s know-how as markdown an agent reads</td><td class="mono-col">aistudio-skill.zip</td></tr>
+<tr><td><strong>The CLI</strong></td><td>288 commands that create and check artifacts</td><td class="mono-col">scripts/aistudio.js</td></tr>
+<tr><td><strong>The extension</strong></td><td>Login, plus a visual editor for <code>.app</code> files</td><td class="mono-col">aistudio-extension.zip</td></tr>
+</tbody></table></div>
+
+<p>Oracle&rsquo;s own guide is written for <strong>Codex</strong>. Everything works the same in <strong>Claude Code</strong> &mdash; you just put the skill in one extra place. That one extra step is <a href="#s5">Step 5</a>.</p>
+</section>
+
+<!-- ═══ 02 ══════════════════════════════════════════════════════════ -->
+<section id="who">
+<h2><span class="sn">02</span><span>Who this is for</span></h2>
+
+<div class="duo">
+  <div class="card">
+    <h4>Anyone</h4>
+    <p>Clone the repo, read the skills, run the CLI on your own laptop. Free. You can build and validate app files with no Fusion environment at all.</p>
+  </div>
+  <div class="card">
+    <h4>Fusion customers</h4>
+    <p>You can go all the way &mdash; publish and put the app in front of real users.</p>
+  </div>
+  <div class="card">
+    <h4>Everyone else</h4>
+    <p>Stay for the five rules. They apply to any agent you build, on any platform.</p>
+  </div>
+</div>
+
+<figure>
+  <img src="images/10-who-this-is-for.webp" alt="Three audiences and how far each one gets: anyone stops at a validated file, Fusion Applications customers get all the way to live for real users, and everyone else stops at the five rules. No Fusion environment is needed to build and validate.">
+  <figcaption><span class="fn">Fig. 4</span><span>Three audiences, three different stopping points.</span></figcaption>
+</figure>
+</section>
+
+<!-- ═══ 03 ══════════════════════════════════════════════════════════ -->
+<section id="rules">
+<h2><span class="sn">03</span><span>The five rules that make this work</span></h2>
+
+<p>Oracle did not just ship a tool. They shipped a set of habits, baked into the skill files. This is the part worth stealing even if you never touch Fusion.</p>
+
+<div class="rules">
+
+  <div class="rule-row">
+    <div class="rn">01</div>
+    <div>
+      <h3>The spec comes first</h3>
+      <p>Nothing gets built until the plan is written down and you agree to it. Two screens, three panels, four detail views, and an explicit list of what it will <em>not</em> build yet.</p>
+      <p class="home">At home we say &ldquo;build me an HR app&rdquo; and hope. Here the agent hands you a written plan and waits.</p>
+    </div>
+  </div>
+
+  <div class="rule-row">
+    <div class="rn">02</div>
+    <div>
+      <h3>One gated write action</h3>
+      <p>Out of the box the app can look, but never change anything. Click around, dig in, ask questions &mdash; all read-only. The one action that touches real HR data has to be switched on by hand, and it asks before it does anything.</p>
+      <p class="home">Twelve tools and write access to everything, wired up on a Sunday, is how you get an incident.</p>
+    </div>
+  </div>
+
+  <div class="rule-row">
+    <div class="rn">03</div>
+    <div>
+      <h3>Discover before you build</h3>
+      <p>The agent searches your files first, finds the workflows that already exist, and reuses them. It only builds what is genuinely missing, and it never edits or renames the rest.</p>
+      <p class="home">The most expensive agent in a big company is the one that rebuilds something that already existed.</p>
+    </div>
+  </div>
+
+  <div class="rule-row">
+    <div class="rn">04</div>
+    <div>
+      <h3>Structure over improvisation</h3>
+      <p>Open one of these workflows and the agent is not making it up as it goes. The steps are fixed: work out what was asked, go get the data, let the model think, send back an answer. And it has <strong>sixty seconds</strong> to finish.</p>
+      <p class="home">One prompt, one model, and hope for the best. When speed and correctness both matter, fixed steps win.</p>
+    </div>
+  </div>
+
+  <div class="rule-row">
+    <div class="rn">05</div>
+    <div>
+      <h3>Unvalidated means unfinished</h3>
+      <p>When the build finishes, the agent does not announce that it is done. It runs the checks first. If the checks have not passed, the skill treats the work as unfinished and fixes it before anything else.</p>
+      <p class="home">Your agent saying &ldquo;done&rdquo; is not proof. The checks passing is.</p>
+    </div>
+  </div>
+
+</div>
+
+<figure>
+  <img src="images/09-five-rules-summary.webp" alt="The five rules, each in one line: the spec comes first — agree the plan in writing; one gated write action — it can look, not touch; discover before you build — find what exists, protect it; structure over improvisation — the model works inside fixed steps; unvalidated means unfinished — done means the checks passed.">
+  <figcaption><span class="fn">Fig. 5</span><span>How you ship agents when a wrong answer is not an option.</span></figcaption>
+</figure>
+</section>
+
+<!-- ═══ 04 ══════════════════════════════════════════════════════════ -->
+<section id="before">
+<h2><span class="sn">04</span><span>Before you start</span></h2>
+
+<p>Get these five things ready. It takes about ten minutes.</p>
+
+<div class="tbl"><table>
+<thead><tr><th class="num-col">#</th><th>What you need</th><th>How to check</th></tr></thead>
+<tbody>
+<tr><td class="num-col">1</td><td><strong>Node.js</strong> v18 or newer</td><td><code>node --version</code></td></tr>
+<tr><td class="num-col">2</td><td><strong>Git</strong></td><td><code>git --version</code></td></tr>
+<tr><td class="num-col">3</td><td><strong>VS Code</strong></td><td><a href="https://code.visualstudio.com/">code.visualstudio.com</a></td></tr>
+<tr><td class="num-col">4</td><td><strong>Claude Code</strong></td><td><a href="https://claude.com/claude-code">claude.com/claude-code</a></td></tr>
+<tr><td class="num-col">5</td><td><strong>Fusion URL + user</strong> <span class="pill pill-warn">optional</span></td><td>Ask your Fusion admin</td></tr>
+</tbody></table></div>
+
+<div class="note">
+  <h4>About number five</h4>
+  <p>You only need a Fusion environment when you want to fetch real business objects or publish the app. You can do the whole setup, build app files, and validate them with no environment at all. Start there if you are just exploring.</p>
+</div>
+</section>
+
+<!-- ═══ 05 ══════════════════════════════════════════════════════════ -->
+<section id="setup">
+<h2><span class="sn">05</span><span>Step-by-step setup</span></h2>
+
+<!-- Step 1 -->
+<div class="step" id="s1"><div class="num">1</div><h3>Get Oracle&rsquo;s repo</h3></div>
+
+<p>Make a folder called <code>fusion-ai-repo</code>, go into it, and clone:</p>
+
+<div class="code"><div class="code-bar"><span class="lbl">Terminal</span><button class="copy" type="button">Copy</button></div>
+<pre><code>mkdir -p ~/fusion-ai-repo
+cd ~/fusion-ai-repo
+git clone https://github.com/oracle/fusion-ai-studio.git</code></pre></div>
+
+<figure>
+  <img src="images/12-repo-release-folder.webp" alt="The oracle/fusion-ai-studio repository with the release-26C folder highlighted.">
+  <figcaption><span class="fn">Fig. 6</span><span>Everything in this guide lives under <code>release-26C</code>.</span></figcaption>
+</figure>
+
+<figure>
+  <img src="images/13-git-clone-start.webp" alt="Terminal running git clone of the fusion-ai-studio repository, receiving objects.">
+  <figcaption><span class="fn">Fig. 7</span><span>The Clone panel gives you the URL; the terminal does the rest.</span></figcaption>
+</figure>
+
+<figure>
+  <img src="images/14-git-clone-done.webp" alt="Terminal showing the git clone progressing to 89 percent of about 1,000 objects.">
+  <figcaption><span class="fn">Fig. 8</span><span>About a thousand objects, a few tens of megabytes.</span></figcaption>
+</figure>
+
+<p>If you have already made the folder, clone into it with a trailing dot &mdash; <code>git clone https://github.com/oracle/fusion-ai-studio.git .</code> &mdash; which is what the screenshots above show.</p>
+
+<p>Prefer not to use Git? On the GitHub page click <strong>Code &rarr; Download ZIP</strong>, then unzip it into <code>fusion-ai-repo</code>. Your folder will be called <code>fusion-ai-studio-main</code> instead of <code>fusion-ai-studio</code>. Everything else is identical &mdash; just remember which name you have.</p>
+
+<p>You now have this:</p>
+
+<div class="tree">fusion-ai-repo/
+└── fusion-ai-studio/
+    └── release-26C/
+        ├── <b>aiapps/</b>       ← 167 sample artifacts across 16 Fusion modules
+        ├── <b>aistudio/</b>     ← the skill, the CLI, the extension
+        └── <b>how-to/</b>       ← Oracle's own guides</div>
+
+<p>What is in <code>aiapps</code> is worth knowing about, because the agent reuses it:</p>
+
+<div class="tbl"><table>
+<thead><tr><th>Artifact type</th><th class="num-col">Count</th><th>Modules covered</th></tr></thead>
+<tbody>
+<tr><td>Workflows <code>.wf</code></td><td class="num-col">99</td><td rowspan="4">HCM: absences, benefits, career development, compensation, employment, human resources, journeys, learning, recruiting, succession management, talent management, time and labour. SCM: inventory, maintenance, cost management. FIN: ledger insights.</td></tr>
+<tr><td>Business objects <code>.bo</code></td><td class="num-col">62</td></tr>
+<tr><td>Apps <code>.app</code></td><td class="num-col">4</td></tr>
+<tr><td>Deeplinks + tools</td><td class="num-col">2</td></tr>
+</tbody></table></div>
+
+<!-- Step 2 -->
+<div class="step" id="s2"><div class="num">2</div><h3>Create your workspace folder</h3></div>
+
+<p>This is a <strong>different folder</strong> from the repo. The repo is where Oracle&rsquo;s stuff lives. The workspace is where <em>your</em> app lives.</p>
+
+<div class="code"><div class="code-bar"><span class="lbl">Terminal</span><button class="copy" type="button">Copy</button></div>
+<pre><code>mkdir -p ~/fusion-ai-workspace
+cd ~/fusion-ai-workspace</code></pre></div>
+
+<p>Keeping them separate matters. When Oracle ships an update you replace things inside the repo and re-copy &mdash; and your own work in the workspace is never at risk.</p>
+
+<!-- Step 3 -->
+<div class="step" id="s3"><div class="num">3</div><h3>Install the VS Code extension</h3></div>
+
+<p>The extension gives you two things: a login flow, and a <strong>visual editor</strong> for <code>.app</code> files. You want both.</p>
+
+<p>Go to the <code>bin</code> folder in the repo:</p>
+
+<div class="tree">fusion-ai-repo/fusion-ai-studio/release-26C/aistudio/bin/
+├── <b>aistudio-extension.zip</b>     ← unzip this now
+├── aistudio-extension.zip.sha256
+├── <b>aistudio-skill.zip</b>         ← and this, in Step 4
+└── aistudio-skill.zip.sha256</div>
+
+<p>Double-click <code>aistudio-extension.zip</code> (macOS) or right-click &rarr; <strong>Extract All</strong> (Windows). Inside you get one file: <code>aistudio-extension.vsix</code>.</p>
+
+<p>Now install it. In VS Code:</p>
+
+<ol>
+  <li>Click the <strong>Extensions</strong> icon in the left bar (the stacked squares)</li>
+  <li>Click the <strong><code>...</code></strong> menu at the top of the Extensions panel</li>
+  <li>Choose <strong>Install from VSIX&hellip;</strong></li>
+</ol>
+
+<figure>
+  <img src="images/15-install-from-vsix-menu.webp" alt="VS Code Extensions panel with the ... menu open and Install from VSIX highlighted.">
+  <figcaption><span class="fn">Fig. 9</span><span><strong>Install from VSIX</strong> is at the bottom of the <code>...</code> menu.</span></figcaption>
+</figure>
+
+<ol start="4">
+  <li>Pick <code>aistudio-extension.vsix</code> and click <strong>Install</strong></li>
+  <li>Reload VS Code if it asks</li>
+</ol>
+
+<figure>
+  <img src="images/16-install-vsix-dialog.webp" alt="The Install from VSIX file picker showing the bin folder with both zips, both checksums and the extracted aistudio-extension.vsix selected.">
+  <figcaption><span class="fn">Fig. 10</span><span>A good look at the <code>bin</code> folder too: both zips, both checksums, and the <code>.vsix</code> you just unpacked.</span></figcaption>
+</figure>
+
+<h4>Check it worked</h4>
+
+<p>Press <code>Cmd+Shift+P</code> (macOS) or <code>Ctrl+Shift+P</code> (Windows/Linux) and type <code>Fusion AI Studio</code>. You should see a list of commands:</p>
+
+<figure>
+  <img src="images/17-fusion-ai-studio-commands.webp" alt="Command palette filtered to Fusion AI Studio, listing Configure Authentication, Open Design View, Create New Agent, Create New App and more.">
+  <figcaption><span class="fn">Fig. 11</span><span>If this list is empty, reload VS Code. Still empty &mdash; reinstall the <code>.vsix</code>.</span></figcaption>
+</figure>
+
+<p>Here is the full set and what each one is for:</p>
+
+<div class="tbl"><table>
+<thead><tr><th>Command</th><th>Use it for</th></tr></thead>
+<tbody>
+<tr><td class="mono-col">Configure Authentication</td><td>Connect VS Code to your Fusion environment</td></tr>
+<tr><td class="mono-col">Fetch from Server</td><td>Pull an existing artifact down into your workspace</td></tr>
+<tr><td class="mono-col">Create New App</td><td>A user-facing workspace with panels, actions and agents</td></tr>
+<tr><td class="mono-col">Create New Workflow</td><td>A step-by-step flow that calls AI, services, code or approvals</td></tr>
+<tr><td class="mono-col">Create New Business Object</td><td>A reusable data connection to Fusion or another service</td></tr>
+<tr><td class="mono-col">Create New Agent</td><td>A reusable AI worker with a role, tools and instructions</td></tr>
+<tr><td class="mono-col">Create New Tool</td><td>A capability for an agent: business object, deeplink, REST, connector</td></tr>
+<tr><td class="mono-col">Create New Connector Instance</td><td>A configured connection to an approved external system</td></tr>
+<tr><td class="mono-col">Create New Deeplink</td><td>A link that opens a target page or record</td></tr>
+<tr><td class="mono-col">Create New Topic</td><td>Instructions guiding an agent on one subject</td></tr>
+<tr><td class="mono-col">Enable / Disable Agentic App Debug Logging</td><td>Turn detailed app logs on or off</td></tr>
+<tr><td class="mono-col">Logout</td><td>Sign out of the environment</td></tr>
+</tbody></table></div>
+
+<!-- Step 4 -->
+<div class="step" id="s4"><div class="num">4</div><h3>Install the aistudio skill</h3></div>
+
+<p>This is the important one. The skill is Oracle&rsquo;s expertise written down so an agent can read it.</p>
+
+<p>Unzip <code>aistudio-skill.zip</code> from the same <code>bin</code> folder. You get a folder called <code>aistudio</code> containing <code>SKILL.md</code>, <code>scripts/</code>, <code>references/</code> and <code>resources/</code>.</p>
+
+<div class="code"><div class="code-bar"><span class="lbl">Terminal &mdash; base skill</span><button class="copy" type="button">Copy</button></div>
+<pre><code>cd ~/fusion-ai-workspace
+mkdir -p .agents/skills
+cp -R ~/fusion-ai-repo/fusion-ai-studio/release-26C/aistudio/bin/aistudio-skill/aistudio \
+      .agents/skills/</code></pre></div>
+
+<p>Now do the same for the <strong>app skills</strong> &mdash; the domain-specific guides. They are in a different folder:</p>
+
+<div class="code"><div class="code-bar"><span class="lbl">Terminal &mdash; domain skills</span><button class="copy" type="button">Copy</button></div>
+<pre><code>cd ~/fusion-ai-repo/fusion-ai-studio/release-26C/aistudio/aistudio-apps-skills
+unzip aistudio-apps-skills.zip
+cp -R aistudio-apps-skills/* ~/fusion-ai-workspace/.agents/skills/</code></pre></div>
+
+<p>You should end up with exactly this:</p>
+
+<div class="tree">fusion-ai-workspace/
+└── .agents/
+    └── skills/
+        ├── <b>aistudio/</b>                                      ← the base skill + CLI
+        │   ├── SKILL.md
+        │   ├── scripts/aistudio.js
+        │   ├── references/prompts/                        ← 30 prompt files
+        │   │   └── workflow-node-prompts/                 ← 27 node prompt files
+        │   └── resources/app-samples/
+        ├── <b>aistudio-apps-succession-management/</b>           ← HCM domain skill
+        └── <b>aistudio-apps-warehouse-operations-shortages/</b>  ← SCM domain skill</div>
+
+<figure>
+  <img src="images/24-app-skill-handoff.webp" alt="The aistudio-handoff.md reference file open in VS Code, showing the Purpose, Local-first rule and Authority and Availability sections.">
+  <figcaption><span class="fn">Fig. 12</span><span>A domain skill handing all file work back to the base skill &mdash; and the local-first rule that makes Rule 3 non-optional.</span></figcaption>
+</figure>
+
+<!-- Step 5 -->
+<div class="step" id="s5"><div class="num">5</div><h3>Make Claude Code see the skills</h3></div>
+
+<div class="note key">
+  <h4>This is the Claude Code step Oracle&rsquo;s guide does not cover</h4>
+  <p>Oracle&rsquo;s guide puts skills in <code>.agents/skills/</code>. That is where <strong>Codex</strong> looks. <strong>Claude Code</strong> looks in <code>.claude/skills/</code>.</p>
+  <p>You do not want two copies. Keep the real files in <code>.agents/skills/</code> (so the CLI paths in every Oracle prompt still work) and point <code>.claude/skills/</code> at them.</p>
+</div>
+
+<h4>macOS and Linux &mdash; use symlinks</h4>
+
+<div class="code"><div class="code-bar"><span class="lbl">Terminal &mdash; macOS / Linux</span><button class="copy" type="button">Copy</button></div>
+<pre><code>cd ~/fusion-ai-workspace
+mkdir -p .claude/skills
+cd .claude/skills
+ln -s ../../.agents/skills/aistudio aistudio
+ln -s ../../.agents/skills/aistudio-apps-succession-management \
+      aistudio-apps-succession-management
+ln -s ../../.agents/skills/aistudio-apps-warehouse-operations-shortages \
+      aistudio-apps-warehouse-operations-shortages
+
+<span class="c"># check: you should see three arrows pointing into .agents/skills</span>
+ls -la ~/fusion-ai-workspace/.claude/skills</code></pre></div>
+
+<h4>Windows &mdash; just copy instead</h4>
+
+<p>Symlinks on Windows need Developer Mode or an admin shell, so save yourself the trouble:</p>
+
+<div class="code"><div class="code-bar"><span class="lbl">PowerShell &mdash; Windows</span><button class="copy" type="button">Copy</button></div>
+<pre><code>cd $HOME\fusion-ai-workspace
+New-Item -ItemType Directory -Force .claude\skills
+Copy-Item -Recurse .agents\skills\* .claude\skills\</code></pre></div>
+
+<p>The trade-off: if you copy, you have to re-copy whenever Oracle ships a skill update. Symlinks update themselves.</p>
+
+<div class="note">
+  <h4>Why keep <code>.agents/skills/</code> as the real home?</h4>
+  <p>Because every Oracle prompt, every example, and the skill&rsquo;s own instructions all say to run the CLI as <code>node .agents/skills/aistudio/scripts/aistudio.js</code>. With this layout that path is always correct, and both Claude Code and Codex work in the same workspace.</p>
+</div>
+
+<!-- Step 6 -->
+<div class="step" id="s6"><div class="num">6</div><h3>Copy the sample apps</h3></div>
+
+<div class="code"><div class="code-bar"><span class="lbl">Terminal</span><button class="copy" type="button">Copy</button></div>
+<pre><code>cp -R ~/fusion-ai-repo/fusion-ai-studio/release-26C/aiapps ~/fusion-ai-workspace/</code></pre></div>
+
+<p>Do not skip this. Rule 3 is &ldquo;discover before you build&rdquo; &mdash; and this folder is what there is to discover. Skip it and the agent has nothing to reuse, so it builds everything from scratch.</p>
+
+<!-- Step 7 -->
+<div class="step" id="s7"><div class="num">7</div><h3>Connect to your Fusion environment</h3></div>
+
+<p>Open your workspace in VS Code (<strong>File &rarr; Open Folder &rarr;</strong> <code>fusion-ai-workspace</code>), then press <code>Cmd/Ctrl+Shift+P</code> and run <strong>Fusion AI Studio: Configure Authentication</strong>.</p>
+
+<p>You get two choices.</p>
+
+<h4>Basic authentication &mdash; fine for dev and test</h4>
+
+<p>Three prompts. First, the <strong>environment URL</strong>. It must end in <code>.com</code> with no extra path &mdash; so <code>https://your-env.fa.us2.oraclecloud.com</code>, not <code>https://your-env.fa.us2.oraclecloud.com/fscmUI/&hellip;</code> Then username, then password.</p>
+
+<figure>
+  <img src="images/18-configure-auth-password.webp" alt="VS Code prompt: AI Studio Configure Basic Authentication step 3 of 3, enter password, noting it is encrypted in workspace env.properties and CLI use requires a shared OS secret store.">
+  <figcaption><span class="fn">Fig. 13</span><span>Step 3 of 3. Read the hint: <span class="q">encrypted in workspace env.properties; CLI use requires a shared OS secret store.</span></span></figcaption>
+</figure>
+
+<h4>OAuth / token authentication &mdash; required for production</h4>
+
+<p>This one is a two-place job: register a public client in Oracle IDCS, then register its Application ID back in AI Agent Studio.</p>
+
+<p><strong>In IDCS &mdash; Integrated applications &rarr; Add application &rarr; Mobile Application.</strong> Save it, open the <strong>OAuth configuration</strong> tab, then click <strong>Edit OAuth configuration</strong>:</p>
+
+<ul>
+  <li>Allowed grant types: <strong>Authorization code</strong>, <strong>Refresh token</strong>, <strong>Implicit</strong>. Leave Device code off.</li>
+  <li>Turn on <strong>Allow non-HTTPS URLs</strong></li>
+  <li>Redirect URLs: <code>http://127.0.0.1:43188/callback</code> and <code>urn:ietf:wg:oauth:2.0:oob</code></li>
+  <li>Logout and post-logout redirect URL: <code>http://127.0.0.1:43188/logout</code></li>
+  <li>Leave <strong>Bypass consent</strong> off</li>
+</ul>
+
+<figure>
+  <img src="images/19-idcs-oauth-grants-redirects.webp" alt="IDCS Edit OAuth configuration panel showing allowed grant types, the Allow non-HTTPS URLs toggle, and two redirect URLs.">
+  <figcaption><span class="fn">Fig. 14</span><span>Grant types, non-HTTPS URLs, and both redirect URLs.</span></figcaption>
+</figure>
+
+<p>Further down the same panel, under <strong>Token issuance policy</strong>, turn on <strong>Add resources</strong> and grant the scopes for <strong>Oracle Fusion AI Cloud (Spectra)</strong> and <strong>Oracle Boss Cloud (Spectra)</strong>. Leave <strong>Add app roles</strong> off.</p>
+
+<figure>
+  <img src="images/20-idcs-oauth-resources-scopes.webp" alt="IDCS token issuance policy with Oracle Boss Cloud (Spectra) and Oracle Fusion AI Cloud (Spectra) added as resources.">
+  <figcaption><span class="fn">Fig. 15</span><span>Two resources, two scopes. Nothing else.</span></figcaption>
+</figure>
+
+<figure>
+  <img src="images/21-idcs-oauth-scopes-detail.webp" alt="Close-up of the two granted scopes in the IDCS resources table.">
+  <figcaption><span class="fn">Fig. 16</span><span>Both scopes carry your environment name: <code>urn:opc:resource:fusion:&lt;your-env&gt;:fusion-ai/</code> and <code>&hellip;:boss/</code>.</span></figcaption>
+</figure>
+
+<p><strong>Then in AI Agent Studio &mdash; Credentials &rarr; AI Studio CLI &rarr; Enable AI Studio CLI.</strong> The page spells out the same nine steps and gives you the field to paste the generated <strong>Application ID</strong> into:</p>
+
+<figure>
+  <img src="images/22-ai-studio-cli-idcs-steps.webp" alt="The AI Studio CLI tab in AI Agent Studio Credentials, listing Oracle's nine IDCS registration steps above the Application ID field.">
+  <figcaption><span class="fn">Fig. 17</span><span>Oracle&rsquo;s own nine steps, in the product, next to the field they end at.</span></figcaption>
+</figure>
+
+<div class="note stop">
+  <h4>Heads up on the naming</h4>
+  <p>That field is labelled <strong>Application ID</strong>, and Oracle&rsquo;s step 9 on the same page says to paste the generated Application ID. Oracle&rsquo;s <em>written</em> how-to (<code>how-to-configure-oauth-for-aistudio-cli.md</code>) talks about the <strong>Client ID</strong> from the OAuth configuration tab instead. If <code>authenticate</code> later fails, that mismatch is the first thing to check.</p>
+</div>
+
+<p>Save it, and the page hands you the finished <code>env.properties</code> &mdash; with a copy button:</p>
+
+<figure>
+  <img src="images/23-ai-studio-cli-env-properties.webp" alt="The AI Studio CLI tab showing the generated env.properties block with clientId, fa-host, orchestratorTokenUrl, primaryScope, redirectUri and tenant.">
+  <figcaption><span class="fn">Fig. 18</span><span>Copy this into <code>env.properties</code> in your workspace root.</span></figcaption>
+</figure>
+
+<p>Then sign in from the terminal:</p>
+
+<div class="code"><div class="code-bar"><span class="lbl">Terminal</span><button class="copy" type="button">Copy</button></div>
+<pre><code>node .agents/skills/aistudio/scripts/aistudio.js authenticate</code></pre></div>
+
+<p>A browser opens. Sign in. Come back. Full details are in Oracle&rsquo;s <code>release-26C/how-to/how-to-configure-oauth-for-aistudio-cli.md</code>.</p>
+
+<h4>Either way, <code>env.properties</code> appears</h4>
+
+<div class="code"><div class="code-bar"><span class="lbl">env.properties</span><button class="copy" type="button">Copy</button></div>
+<pre><code><span class="k">aistudio.clientId</span>=<span class="s">&lt;your client id&gt;</span>
+<span class="k">aistudio.fa-host</span>=<span class="s">&lt;your environment host&gt;</span>
+<span class="k">aistudio.orchestratorTokenUrl</span>=<span class="s">&lt;token url&gt;</span>
+<span class="k">aistudio.primaryScope</span>=<span class="s">&lt;scope&gt;</span>
+<span class="k">aistudio.redirectUri</span>=<span class="s">http://127.0.0.1:43188/callback</span>
+<span class="k">aistudio.tenant</span>=<span class="s">&lt;tenant&gt;</span>
+<span class="k">aistudio.dev-mode</span>=<span class="s">&lt;true|false&gt;</span></code></pre></div>
+
+<!-- Step 8 -->
+<div class="step" id="s8"><div class="num">8</div><h3>Protect your secrets</h3></div>
+
+<p>Do this now, before you forget. Create a <code>.gitignore</code> in your workspace:</p>
+
+<div class="code"><div class="code-bar"><span class="lbl">.gitignore</span><button class="copy" type="button">Copy</button></div>
+<pre><code>env.properties
+.debug/</code></pre></div>
+
+<p><code>env.properties</code> holds your environment host, client ID and encrypted password. It does not belong in a shared repo. <code>.debug/</code> holds recorded test data from real runs, which can contain live business data.</p>
+
+<!-- Step 9 -->
+<div class="step" id="s9"><div class="num">9</div><h3>Check the CLI works</h3></div>
+
+<div class="code"><div class="code-bar"><span class="lbl">Terminal &mdash; from the workspace root</span><button class="copy" type="button">Copy</button></div>
+<pre><code>node .agents/skills/aistudio/scripts/aistudio.js --help
+
+<span class="c"># what version am I on?</span>
+node .agents/skills/aistudio/scripts/aistudio.js version
+
+<span class="c"># who am I signed in as? (needs auth)</span>
+node .agents/skills/aistudio/scripts/aistudio.js whoami</code></pre></div>
+
+<p><code>--help</code> returns all 288 commands.</p>
+
+<div class="note key">
+  <h4>Three rules for running the CLI, and they matter</h4>
+  <ul>
+    <li><strong>Always run it from the workspace root.</strong> Never <code>cd</code> into the skill folder.</li>
+    <li><strong>Always call it by full path.</strong> There is no global <code>aistudio</code> command to install. When Oracle&rsquo;s prompts show <code>aistudio &lt;command&gt;</code>, that is shorthand for the full <code>node .agents/&hellip;</code> path.</li>
+    <li><strong>Never use <code>npm run</code> or <code>npm test</code></strong> to run workflow tests. Those scripts are for CI pipelines. Call the CLI directly.</li>
+  </ul>
+</div>
+
+<!-- Step 10 -->
+<div class="step" id="s10"><div class="num">10</div><h3>Add a CLAUDE.md</h3></div>
+
+<p>Optional, but it saves you a lot of repetition. Create <code>CLAUDE.md</code> in your workspace root:</p>
+
+<div class="code"><div class="code-bar"><span class="lbl">CLAUDE.md</span><button class="copy" type="button">Copy</button></div>
+<pre><code># Oracle AI Agent Studio workspace
+
+## How to run the CLI
+- Always run from the workspace root. Never `cd` into the skill folder.
+- Always invoke by path: `node .agents/skills/aistudio/scripts/aistudio.js &lt;command&gt; ...`
+- There is no global `aistudio` binary. Do not run `which aistudio` or install one.
+- Never use `npm run` or `npm test` for workflow or app tests.
+
+## Skills
+- Use the `aistudio` skill for all artifact work (apps, workflows, business objects,
+  tools, agents, topics, connectors, approvals, policies, document schemas, functions).
+- Use `aistudio-apps-succession-management` for HCM succession apps.
+- Use `aistudio-apps-warehouse-operations-shortages` for SCM warehouse and shortage apps.
+
+## Hard rules
+- Do NOT run `init` unless I explicitly ask to scaffold a blank project.
+- Discover and reuse before creating. Treat every existing artifact as read-only.
+- Keep everything local. Only fetch, save, publish or push when I explicitly ask.
+- Never publish a workflow from the CLI.
+- After a material edit, run the matching `validate-*` command.
+  Unvalidated means unfinished.
+- Never write a raw password into env.properties, command arguments, files or logs.
+
+## Layout
+- Local artifacts: `src/&lt;type&gt;/` (workflows, apps, agents, businessObjects, tools, ...)
+- Oracle samples to reuse: `aiapps/`
+- Secrets: `env.properties` (git-ignored)</code></pre></div>
+</section>
+
+<!-- ═══ 06 ══════════════════════════════════════════════════════════ -->
+<section id="build">
+<h2><span class="sn">06</span><span>Your first build</span></h2>
+
+<p>Now the fun part. Open a terminal in your workspace and start Claude Code:</p>
+
+<div class="code"><div class="code-bar"><span class="lbl">Terminal</span><button class="copy" type="button">Copy</button></div>
+<pre><code>cd ~/fusion-ai-workspace
+claude</code></pre></div>
+
+<!-- Step 11 -->
+<div class="step" id="s11"><div class="num">11</div><h3>Describe the outcome</h3></div>
+
+<p>Do not describe screens. Describe the business problem. This is the shape of prompt that works:</p>
+
+<div class="code"><div class="code-bar"><span class="lbl">Prompt</span><button class="copy" type="button">Copy</button></div>
+<pre><code>Design and build a Sales Order Workspace agentic app for the fulfilment
+specialist who owns a single sales order end to end.
+
+The app should give one order's full picture — order 360, what has shipped
+and what has not, which lines are at risk of missing their date — explain
+why each exception matters, and let the specialist send the customer-facing
+updates that follow from it.</code></pre></div>
+
+<p>Notice what is <em>not</em> in there: no panel names, no widget types, no file names, no field names. That is the point. The skill knows how an order-management workspace is supposed to be shaped.</p>
+
+<div class="note">
+  <h4>A note on names</h4>
+  <p>In the screenshots below, the package, workspace and artifact names are mine. Yours will be different. Everything else &mdash; the sequence, the gates, the wording the skill uses &mdash; is the same.</p>
+</div>
+
+<!-- Step 12 -->
+<div class="step" id="s12"><div class="num">12</div><h3>The agent writes the spec, then stops</h3></div>
+
+<p>This is Rule 1, and it is the most important screenshot in this guide. Below is the gate from the run where I added a fourth panel &mdash; <strong>In-Transit Shipments</strong> &mdash; to a finished app. Same behaviour on the first build, and on every change after it:</p>
+
+<figure>
+  <img src="images/25-agent-scope-proposal.webp" alt="Claude Code terminal showing the agent's written scope for a new In-Transit Shipments panel: app goal and user, first-load experience, query behaviour, priority actions, communications, side effects, launch context and validation, ending in a question.">
+  <figcaption><span class="fn">Fig. 19</span><span><span class="q">&ldquo;Do you want any changes, or should I continue with this scope?&rdquo;</span> Nothing has been written yet.</span></figcaption>
+</figure>
+
+<p>Read what it commits to before writing anything:</p>
+
+<div class="tbl"><table>
+<thead><tr><th>Section of the scope</th><th>What it pins down</th></tr></thead>
+<tbody>
+<tr><td><strong>App goal and user</strong></td><td><span class="q">&ldquo;for one sales order, show what has physically shipped but not yet arrived, and whether it will land on time&rdquo;</span> &mdash; for <span class="q">&ldquo;the same fulfillment specialist / order manager who uses the existing three panels&rdquo;</span></td></tr>
+<tr><td><strong>First-load experience</strong></td><td>Which panel, which lane, which layout, and which widgets: <code>ORA_LAYOUT_MULTIRECORD</code>, <code>ORA_LAYOUT_MULTICARD</code>, <code>ORA_LAYOUT_CHART</code></td></tr>
+<tr><td><strong>Priority actions</strong></td><td><span class="q">&ldquo;Recommend omit for now&rdquo;</span> &mdash; with the list of business-object functions it checked before deciding</td></tr>
+<tr><td><strong>Communications</strong></td><td><span class="q">&ldquo;Omit new ones. The existing Communications panel already covers the customer-facing outputs&rdquo;</span></td></tr>
+<tr><td><strong>Side effects</strong></td><td><span class="q">&ldquo;None. Read-only panel; no writes, sends, or navigation.&rdquo;</span> That is Rule 2, in writing, before the build</td></tr>
+<tr><td><strong>Validation</strong></td><td>The exact test loop it will run afterwards, named command by named command</td></tr>
+</tbody></table></div>
+
+<div class="note stop">
+  <h4>The gate is the feature</h4>
+  <p>It stops on a question. Say no, and the flow ends having created, modified, fetched, saved or published <em>nothing at all</em>. Every gate in these skills works this way.</p>
+</div>
+
+<!-- Step 13 -->
+<div class="step" id="s13"><div class="num">13</div><h3>Discovery, and protected reuse</h3></div>
+
+<p>Look at two of those decisions again. It omitted new priority actions <em>because it had already checked what existed</em>, and it omitted new communications <em>because the existing panel already covered them</em>. That is Rule 3 &mdash; and it is not a habit the model happens to have. It is written into the skill. The same handoff document from <a href="#s4">Step 4</a> spells it out:</p>
+
+<div class="note key">
+  <h4>Straight out of the skill&rsquo;s handoff document</h4>
+  <p><strong>Local-first rule.</strong> For every discovery or reference lookup, search the local workspace or local AI Studio project first. Search the environment only if no related local artifact is found, or if the user explicitly asks to compare with environment artifacts.</p>
+  <p>Environment lookup is read-only. Do not fetch over local files, save, publish, force refresh, overwrite, or otherwise change local or server artifacts as part of discovery.</p>
+</div>
+
+<p>The most expensive agent in a big company is the one that rebuilds something that already existed. This one is told, in writing, not to be that.</p>
+
+<!-- Step 14 -->
+<div class="step" id="s14"><div class="num">14</div><h3>Files, then checks</h3></div>
+
+<p>Say continue, and it builds &mdash; narrating each step and running the CLI, not inventing file contents:</p>
+
+<figure>
+  <img src="images/26-agent-build-log.webp" alt="Claude Code terminal build log: confirmed building now, creating the backing workflow, extracting resolved BO output specs from existing workflows, wiring the graph, fixing the edge op key, workflow validates, adding the panel to the app, then getting the workflow test sync plan.">
+  <figcaption><span class="fn">Fig. 20</span><span>Validate the workflow, <em>then</em> attach it to the app. In that order, every time.</span></figcaption>
+</figure>
+
+<p>The order of those lines is the whole discipline:</p>
+
+<div class="tree">Confirmed — building now.
+Creating the backing workflow.
+Now extracting the resolved BO output specs from the existing workflows
+  so I don't need remote enrichment.        ← reuse, not re-fetch
+Now the stage router and the two terminal stage nodes.
+Now wiring the graph.
+<b>The edge op key is label, not outcome. Fixing the wiring.</b>    ← caught by validation
+<b>Workflow validates. Now adding the panel to the app.</b></div>
+
+<p>It validated the workflow <strong>before</strong> attaching it to the app, found its own wiring mistake, and fixed it. Then it went into the test loop it promised in Step 12 &mdash; <code>get-workflow-test-sync-plan</code>, then <code>do-sync-app-tests</code>, then <code>get-app-test-final-summary</code>.</p>
+
+<div class="note key">
+  <h4>Rule 5, in practice</h4>
+  <p>The agent does not get to say &ldquo;done&rdquo;. The checks do.</p>
+</div>
+
+<p>Your workspace now holds real artifacts, in Oracle&rsquo;s app-package layout:</p>
+
+<div class="tree">app-pkg/&lt;your-package&gt;/sources/ai/self/&lt;YourWorkspace&gt;/
+├── <b>applications/&lt;app&gt;/</b>
+│   └── &lt;app&gt;.apps
+├── <b>workflows/</b>
+│   ├── so_order_360/
+│   ├── so_fulfillment/
+│   ├── so_communications/
+│   └── so_in_transit/
+├── agents/
+└── tools/
+<b>test-reports/workflows/</b>               ← suite-result.html / .json / .md</div>
+
+<!-- Step 15 -->
+<div class="step" id="s15"><div class="num">15</div><h3>Open it in the visual editors</h3></div>
+
+<p>Click a <code>.wf</code> file and the extension opens the real workflow editor. This is Rule 4 made visible &mdash; the steps are fixed, and the model only fills the slots inside them:</p>
+
+<figure>
+  <img src="images/27-workflow-visual-editor.webp" alt="The Fusion AI Studio visual workflow editor showing a fulfilment workflow graph: resolve order number, resolve order, has order condition, get order lines or order not found, get actionable holds, get info holds.">
+  <figcaption><span class="fn">Fig. 21</span><span>Resolve the order &rarr; <em>has order?</em> &rarr; get the lines, or return <strong>Order Not Found</strong>. No improvisation, and sixty seconds to finish.</span></figcaption>
+</figure>
+
+<p>Click a <code>.apps</code> file and you get the app editor &mdash; the same one that exists in the Fusion UI:</p>
+
+<figure>
+  <img src="images/28-visual-app-editor.webp" alt="The Fusion AI Studio visual app editor showing the Sales Order Workspace with Ask Oracle, Summary, Order Advisor, Fulfillment Advisor and Communications sections, plus an App Settings side panel.">
+  <figcaption><span class="fn">Fig. 22</span><span>Title, subtitle, dynamic subtitle agent, security roles, panel layout, and the upload and context-switching switches.</span></figcaption>
+</figure>
+
+<p>Edit here or edit through the agent; both write the same file.</p>
+
+<div class="note stop">
+  <h4>If you see &ldquo;This app has been modified on the server&rdquo;</h4>
+  <p>Someone changed the server copy. Pick <strong>Refresh from Server</strong> to take theirs, or <strong>Cancel</strong> to think about it. Do not reach for <strong>Override Server</strong> unless you are certain.</p>
+</div>
+
+<!-- Step 16 -->
+<div class="step" id="s16"><div class="num">16</div><h3>Save it, then look at it</h3></div>
+
+<p>Everything up to here is <strong>local</strong>. Nothing has touched your Fusion environment. Save the app as a remote draft (the commands are just below) and it appears in AI Agent Studio under <strong>Applications</strong> &mdash; as a <strong>Draft</strong>, not live:</p>
+
+<figure>
+  <img src="images/29-applications-list-draft.webp" alt="The Applications list in Oracle AI Agent Studio showing the Sales Order Workspace with a Draft status pill.">
+  <figcaption><span class="fn">Fig. 23</span><span>Saved is not published. The status pill says <strong>Draft</strong>.</span></figcaption>
+</figure>
+
+<p>And here it is running, from one paragraph of plain English:</p>
+
+<figure>
+  <img src="images/30-app-running-dark.webp" alt="The Sales Order Workspace running: title and subtitle, Ask Oracle, an open sales order headline, Order Advisor and Fulfillment Advisor panels, and a right-hand rail with two priority actions and five communications.">
+  <figcaption><span class="fn">Fig. 24</span><span>One order, four panels, two priority actions, five outbound formats, and Ask Oracle across the top.</span></figcaption>
+</figure>
+
+<p>Nothing on that screen changed a record. Every write is an action a human has to press.</p>
+
+<h3>Saving and publishing</h3>
+
+<p>These are the two commands behind Step 16:</p>
+
+<div class="code"><div class="code-bar"><span class="lbl">Terminal</span><button class="copy" type="button">Copy</button></div>
+<pre><code><span class="c"># save an app as a remote draft</span>
+node .agents/skills/aistudio/scripts/aistudio.js do-save-app \
+  --file app-pkg/&lt;your-package&gt;/sources/ai/self/&lt;YourWorkspace&gt;/applications/&lt;app&gt;/&lt;app&gt;.apps
+
+<span class="c"># pull the server's version down instead</span>
+node .agents/skills/aistudio/scripts/aistudio.js do-fetch-app \
+  --code &lt;YOUR_APP_CODE&gt;</code></pre></div>
+
+<p>On a plain (non-package) workspace the file path is simply <code>src/apps/&lt;app&gt;.app</code>.</p>
+
+<div class="note key">
+  <h4>One hard limit worth knowing</h4>
+  <p>You cannot publish a workflow from the CLI. That is deliberate. Publishing a workflow makes it live for real users, and Oracle keeps that as a human decision in the Fusion UI. The skill is explicitly told not to work around it.</p>
+</div>
+</section>
+
+<!-- ═══ 07 ══════════════════════════════════════════════════════════ -->
+<section id="skills">
+<h2><span class="sn">07</span><span>Every skill and what it does</span></h2>
+
+<h3>The three skills you install</h3>
+
+<div class="tbl"><table>
+<thead><tr><th>Skill</th><th>Slash command</th><th>What it is for</th></tr></thead>
+<tbody>
+<tr>
+  <td><strong>aistudio</strong></td>
+  <td class="mono-col">/aistudio</td>
+  <td>The base skill. Handles every artifact type &mdash; apps, workflows, business objects, tools, agents, topics, deeplinks, connectors, approvals, policies, document schemas, functions. Routes your request, loads the right reference, runs the CLI. <strong>This is the one that does the actual work.</strong></td>
+</tr>
+<tr>
+  <td><strong>aistudio-apps-<wbr>succession-<wbr>management</strong></td>
+  <td class="mono-col">/aistudio-apps-<wbr>succession-<wbr>management</td>
+  <td>A guided companion for HCM succession apps. Knows what a succession readiness workspace should contain, walks you through scope, and hands all file operations to <code>aistudio</code>. New artifacts get the <code>SP_</code> prefix.</td>
+</tr>
+<tr>
+  <td><strong>aistudio-apps-<wbr>warehouse-operations-<wbr>shortages</strong></td>
+  <td class="mono-col">/aistudio-apps-<wbr>warehouse-operations-<wbr>shortages</td>
+  <td>The same idea for SCM. Warehouse operations, shortages, stockouts, delayed outbound demand, inbound exceptions, tasking. New artifacts get the <code>WO_</code> prefix.</td>
+</tr>
+</tbody></table></div>
+
+<div class="note">
+  <h4>How the two layers relate</h4>
+  <p>The domain skills are wrappers. They handle the conversation &mdash; what should this app contain, which panels, what is in scope. They never create a file themselves. Every file operation goes down to <code>aistudio</code>. That is why they can be beginner-friendly without being unsafe.</p>
+  <p>You usually do not need to type a slash command at all. Say &ldquo;build a succession planning app&rdquo; and the right skill loads on its own. Type <code>/aistudio</code> when you want to force it.</p>
+</div>
+
+<h3>What the domain skills guarantee</h3>
+
+<p>Both follow the same contract, and it is a good one:</p>
+
+<ul>
+  <li><strong>A structured welcome</strong> before anything happens &mdash; business purpose, recommended MVP, what is deliberately deferred, how it will be built</li>
+  <li><strong>Exactly one option marked &ldquo;Recommended&rdquo;</strong> at every decision</li>
+  <li><strong>A pause after every gate.</strong> No forward motion without your choice</li>
+  <li><strong>A written proposal</strong> before any file is created</li>
+  <li><strong>Every discovered artifact treated as read-only.</strong> Never modified, renamed, deleted or overwritten</li>
+  <li><strong>Validation of only the files this run created.</strong> Not directories, not globs, not siblings</li>
+  <li><strong>A &ldquo;Stop&rdquo; option</strong> at every step that leaves nothing changed</li>
+</ul>
+
+<p>One difference worth knowing: the succession skill searches <strong>your local workspace first</strong>, then the environment. The warehouse skill searches the <strong>connected environment first</strong>, then falls back to local. That is because warehouse artifacts ship seeded in Fusion, while succession samples ship in the GitHub repo.</p>
+
+<h3>Inside <code>aistudio</code>: the 30 prompt reference files</h3>
+
+<p>The base skill stays short on purpose. The detail lives in <code>references/prompts/</code>, and the agent loads only what the task needs &mdash; that is what keeps it fast.</p>
+
+<h4>Workflows</h4>
+<div class="tbl"><table>
+<thead><tr><th>File</th><th>What it covers</th></tr></thead>
+<tbody>
+<tr><td class="mono-col">workflow-vibe.md</td><td>The main workflow authoring guide</td></tr>
+<tr><td class="mono-col">workflow-debug.md</td><td>Debugging a workflow that misbehaves</td></tr>
+<tr><td class="mono-col">workflow-debug-plan.md</td><td>Plan-mode debugging</td></tr>
+<tr><td class="mono-col">workflow-test-authoring.md</td><td>Generating, recording, running, judging and self-healing workflow tests. Also model cost and token optimisation.</td></tr>
+<tr><td class="mono-col">workflow-cli-compat.md</td><td>Which CLI command matches which workflow operation</td></tr>
+</tbody></table></div>
+
+<h4>Agentic apps</h4>
+<div class="tbl"><table>
+<thead><tr><th>File</th><th>What it covers</th></tr></thead>
+<tbody>
+<tr><td class="mono-col">app-ingestion.md</td><td>The intake questions to ask before starting a new app</td></tr>
+<tr><td class="mono-col">app-best-practices.md</td><td>App structure, workflow contracts, widgets, actions, communications, validation</td></tr>
+<tr><td class="mono-col">app-vibe-master.md</td><td>The main app authoring guide</td></tr>
+<tr><td class="mono-col">app-vibe-plan.md</td><td>Plan-mode app design</td></tr>
+<tr><td class="mono-col">app-vibe-actions.md</td><td>Building app actions</td></tr>
+<tr><td class="mono-col">app-vibe-templates.md</td><td>Document templates &mdash; PowerPoint, PDF, email, text</td></tr>
+<tr><td class="mono-col">app-vibe-widgets.md</td><td>Choosing and configuring the seven widget types</td></tr>
+<tr><td class="mono-col">app-test-authoring.md</td><td>App test generation, recording, widget validation, self-healing</td></tr>
+</tbody></table></div>
+
+<h4>Data and tools</h4>
+<div class="tbl"><table>
+<thead><tr><th>File</th><th>What it covers</th></tr></thead>
+<tbody>
+<tr><td class="mono-col">business-object-builder.md</td><td>Building business objects &mdash; your data connections</td></tr>
+<tr><td class="mono-col">business-object-cli-compat.md</td><td>Business object CLI parity</td></tr>
+<tr><td class="mono-col">tools-builder.md</td><td>Building tools: business object, deeplink, document, email, external REST, MCP, connector</td></tr>
+<tr><td class="mono-col">tools-cli-compat.md</td><td>Tool CLI parity</td></tr>
+<tr><td class="mono-col">connector-definition-cli-compat.md</td><td>Generating connector definitions from OpenAPI or MCP specs</td></tr>
+<tr><td class="mono-col">connector-instance-cli-compat.md</td><td>Configuring connector instances</td></tr>
+</tbody></table></div>
+
+<h4>Governance and documents</h4>
+<div class="tbl"><table>
+<thead><tr><th>File</th><th>What it covers</th></tr></thead>
+<tbody>
+<tr><td class="mono-col">approval-process-builder.md</td><td>Approval processes, levels, approver types, notification channels</td></tr>
+<tr><td class="mono-col">approval-process-cli-compat.md</td><td>Approval CLI parity</td></tr>
+<tr><td class="mono-col">policy-store-builder.md</td><td>Policy stores &mdash; turning policy documents into callable functions</td></tr>
+<tr><td class="mono-col">policy-store-cli-compat.md</td><td>Policy CLI parity</td></tr>
+<tr><td class="mono-col">document-schema-builder.md</td><td>Document schemas for structured extraction</td></tr>
+<tr><td class="mono-col">document-schema-cli-compat.md</td><td>Document schema CLI parity</td></tr>
+<tr><td class="mono-col">function-builder.md</td><td>Reusable function templates</td></tr>
+<tr><td class="mono-col">function-cli-compat.md</td><td>Function CLI parity</td></tr>
+</tbody></table></div>
+
+<h4>General</h4>
+<div class="tbl"><table>
+<thead><tr><th>File</th><th>What it covers</th></tr></thead>
+<tbody>
+<tr><td class="mono-col">index.md</td><td>The map of all of the above</td></tr>
+<tr><td class="mono-col">artifact-conventions.md</td><td>File paths, extension mapping, normalised file shape</td></tr>
+</tbody></table></div>
+
+<h3>The 27 workflow node prompt files</h3>
+
+<p>Every node type in a workflow graph has its own rule file, in <code>references/prompts/workflow-node-prompts/</code>:</p>
+
+<div class="tbl"><table>
+<thead><tr><th>Group</th><th>Node prompt files</th></tr></thead>
+<tbody>
+<tr><td><strong>Structure</strong></td><td class="mono-col">start-end · return · reference · reference-block · comment-diagram-only</td></tr>
+<tr><td><strong>AI</strong></td><td class="mono-col">llm · agent · rag-document-tool</td></tr>
+<tr><td><strong>Logic</strong></td><td class="mono-col">code · set-variables · if-condition · switch · for-loop · while-loop · parallel · wait</td></tr>
+<tr><td><strong>Data</strong></td><td class="mono-col">bo-function · external-rest · tool · document-processor · vector-db-reader · vector-db-writer</td></tr>
+<tr><td><strong>People</strong></td><td class="mono-col">human-approval · email</td></tr>
+<tr><td><strong>Composition</strong></td><td class="mono-col">workflow</td></tr>
+</tbody></table></div>
+
+<p>You will never read these yourself. The agent reads the two or three it needs and ignores the rest.</p>
+
+<h3>The artifacts you can create</h3>
+
+<div class="tbl"><table>
+<thead><tr><th>Artifact</th><th>Extension</th><th>In plain language</th></tr></thead>
+<tbody>
+<tr><td>App</td><td class="mono-col">.app</td><td>The screen a business user opens</td></tr>
+<tr><td>Workflow</td><td class="mono-col">.wf</td><td>The step-by-step plan behind a panel</td></tr>
+<tr><td>Business Object</td><td class="mono-col">.bo</td><td>A connection to real data</td></tr>
+<tr><td>Agent</td><td class="mono-col">.agent</td><td>A reusable AI worker with a role and tools</td></tr>
+<tr><td>Tool</td><td class="mono-col">.tool</td><td>One capability an agent can use</td></tr>
+<tr><td>Topic</td><td class="mono-col">.topic</td><td>Instructions for one subject area</td></tr>
+<tr><td>Deeplink</td><td class="mono-col">.dl</td><td>A link that opens a Fusion page or record</td></tr>
+<tr><td>Connector Definition</td><td class="mono-col">.connectorDefinition</td><td>A connector generated from an API spec</td></tr>
+<tr><td>Connector Instance</td><td class="mono-col">.connectorInstance</td><td>A configured external connection</td></tr>
+<tr><td>Approval Process</td><td class="mono-col">.approval</td><td>Who approves what, and how they are told</td></tr>
+<tr><td>Policy Store</td><td class="mono-col">.policy</td><td>Policy documents turned into callable functions</td></tr>
+<tr><td>Policy Template</td><td class="mono-col">.policyTemplate</td><td>A reusable policy function contract</td></tr>
+<tr><td>Document Schema</td><td class="mono-col">.documentSchema</td><td>The shape to pull out of a document</td></tr>
+<tr><td>Function Template</td><td class="mono-col">.function</td><td>A reusable code function</td></tr>
+</tbody></table></div>
+
+<p>They live under <code>src/&lt;type&gt;/</code> in a plain workspace, or inside <code>app-pkg/&lt;package&gt;/sources/</code> if you use app packages.</p>
+</section>
+
+<!-- ═══ 08 ══════════════════════════════════════════════════════════ -->
+<section id="slash">
+<h2><span class="sn">08</span><span>Slash commands</span></h2>
+
+<div class="note key">
+  <h4>Be precise here, because it trips people up</h4>
+  <p><strong>Oracle does not ship slash commands.</strong> It ships <em>skills</em>. Claude Code turns every skill into a slash command automatically, so after Step 5 you get three.</p>
+</div>
+
+<div class="code"><div class="code-bar"><span class="lbl">Available after Step 5</span><button class="copy" type="button">Copy</button></div>
+<pre><code>/aistudio
+/aistudio-apps-succession-management
+/aistudio-apps-warehouse-operations-shortages</code></pre></div>
+
+<p>Type <code>/</code> in Claude Code and they appear in the list. Most of the time you will not need them &mdash; describe the outcome and the right skill loads itself.</p>
+
+<p>There is a second, separate set: the <strong>VS Code command palette</strong> commands from the extension, reached with <code>Cmd/Ctrl+Shift+P</code>. Those are the twelve in the <a href="#s3">Step 3 table</a>. Different mechanism, different place, both useful.</p>
+
+<h3>Slash commands worth creating yourself</h3>
+
+<p>These are the ones I actually use. Drop each as a <code>.md</code> file in <code>.claude/commands/</code> in your workspace and it becomes a slash command.</p>
+
+<h4>/ai-status &mdash; is everything wired up?</h4>
+<div class="code"><div class="code-bar"><span class="lbl">.claude/commands/ai-status.md</span><button class="copy" type="button">Copy</button></div>
+<pre><code>Report the state of this AI Studio workspace. Do not change anything.
+
+1. Run `node .agents/skills/aistudio/scripts/aistudio.js version`
+2. Run `node .agents/skills/aistudio/scripts/aistudio.js whoami`
+3. List local artifacts under `src/` and `app-pkg/*/sources/`, grouped by type
+4. List which skills are present in `.agents/skills/`
+5. Confirm `env.properties` is covered by `.gitignore`
+
+Report findings as a short table. Do not run init, fetch, save or publish.</code></pre></div>
+
+<h4>/ai-validate &mdash; did everything pass?</h4>
+<div class="code"><div class="code-bar"><span class="lbl">.claude/commands/ai-validate.md</span><button class="copy" type="button">Copy</button></div>
+<pre><code>Validate every local artifact I have created in this workspace.
+
+For each file under `src/` and `app-pkg/*/sources/`, run the matching
+`validate-*` command with `--file &lt;path&gt;`, one file at a time.
+
+Never validate a directory or a glob. Never validate anything under `aiapps/`
+— those are Oracle's read-only samples.
+
+Report a table: file, artifact type, pass or fail, and the exact error text
+for any failure. Do not attempt fixes unless I ask.</code></pre></div>
+
+<h4>/ai-discover &mdash; what already exists?</h4>
+<div class="code"><div class="code-bar"><span class="lbl">.claude/commands/ai-discover.md</span><button class="copy" type="button">Copy</button></div>
+<pre><code>Find what already exists before I build anything new: $ARGUMENTS
+
+Search the local workspace first — `aiapps/`, `src/`, and any app packages.
+Only search the connected environment if nothing relevant is found locally.
+
+Report a table: artifact name, type, file path, status (Found locally /
+Found in environment / Not found), and one line on what it does.
+
+Treat everything you find as read-only. Recommend reuse over creation.
+Do not create, modify or fetch anything.</code></pre></div>
+
+<h4>/ai-explain &mdash; what does this artifact do?</h4>
+<div class="code"><div class="code-bar"><span class="lbl">.claude/commands/ai-explain.md</span><button class="copy" type="button">Copy</button></div>
+<pre><code>Explain this artifact in plain business language: $ARGUMENTS
+
+Cover: what business question it answers, what data it reads, what it returns,
+which nodes or panels it contains, and whether it writes any data.
+
+Use `get-workflow-node-structure`, `get-panel-metadata` or the matching
+inspect command — read-only only. No changes.</code></pre></div>
+
+<h4>/ai-app &mdash; build a new agentic app</h4>
+<div class="code"><div class="code-bar"><span class="lbl">.claude/commands/ai-app.md</span><button class="copy" type="button">Copy</button></div>
+<pre><code>Build a new agentic app: $ARGUMENTS
+
+Use the right skill for the domain — `aistudio-apps-succession-management` for
+HCM succession, `aistudio-apps-warehouse-operations-shortages` for SCM
+warehouse and shortages, otherwise `aistudio`.
+
+Follow the skill's flow exactly. Discovery first, written proposal second,
+my approval third, creation fourth, validation last.
+Do not create any file before I approve the proposal.</code></pre></div>
+
+<h4>/ai-test &mdash; run the test sync loop</h4>
+<div class="code"><div class="code-bar"><span class="lbl">.claude/commands/ai-test.md</span><button class="copy" type="button">Copy</button></div>
+<pre><code>Run the test sync loop for: $ARGUMENTS
+
+1. `get-workflow-test-sync-plan --file &lt;file&gt;` and show me the plan
+2. Wait for my go-ahead
+3. Complete the sync loop per `workflow-test-authoring.md`
+4. `get-workflow-test-final-summary --file &lt;file&gt;`
+
+Use that final summary output verbatim as the evidence in a section titled
+`Validation and Insights`. Never pass `--judge-provider remote`.
+Never use npm scripts.</code></pre></div>
+
+<h4>/ai-cost &mdash; where are the tokens going?</h4>
+<div class="code"><div class="code-bar"><span class="lbl">.claude/commands/ai-cost.md</span><button class="copy" type="button">Copy</button></div>
+<pre><code>Analyse model cost and token usage for: $ARGUMENTS
+
+Read the optimisation section of `workflow-test-authoring.md`, then:
+- `get-workflow-model-override-targets` to see which nodes can change model
+- `analyze-token-usage` on the most recent completed test run
+- `propose-sweep-candidates` for a suggested optimisation sweep
+
+Report where tokens are going and the two or three changes with the best
+payoff. Do not change any model without my approval.</code></pre></div>
+
+<h4>/ai-safety &mdash; can it change anything it should not?</h4>
+<div class="code"><div class="code-bar"><span class="lbl">.claude/commands/ai-safety.md</span><button class="copy" type="button">Copy</button></div>
+<pre><code>Safety review of everything I have built in this workspace.
+
+For each local app and workflow, report:
+- every action that writes or changes business data
+- whether each one has a visible review-and-confirm step before the write
+- every outbound communication (email, text, notification) and what triggers it
+- anything that could run without a human saying yes
+
+Flag anything that can change a record without explicit confirmation.
+Read-only review. Change nothing.</code></pre></div>
+
+<h3>A normal session</h3>
+<div class="code"><div class="code-bar"><span class="lbl">Claude Code</span><button class="copy" type="button">Copy</button></div>
+<pre><code>/ai-status                              <span class="c">→ is everything wired up?</span>
+/ai-discover succession workflows       <span class="c">→ what already exists?</span>
+/ai-app a succession planning app for people managers
+/ai-validate                            <span class="c">→ did it pass?</span>
+/ai-safety                              <span class="c">→ can it change anything it should not?</span></code></pre></div>
+</section>
+
+<!-- ═══ 09 ══════════════════════════════════════════════════════════ -->
+<section id="cli">
+<h2><span class="sn">09</span><span>The CLI command map</span></h2>
+
+<p>288 commands is a lot. You do not need to memorise any of them &mdash; the agent picks them. But knowing the shape helps you read what the agent is doing, and spot when it is about to do something you did not intend.</p>
+
+<h3>Authentication and setup</h3>
+<div class="tbl"><table>
+<thead><tr><th>Command</th><th>What it does</th></tr></thead>
+<tbody>
+<tr><td class="mono-col">authenticate</td><td>Sign in via OAuth PKCE</td></tr>
+<tr><td class="mono-col">configure-basic-auth</td><td>Save the FA password encrypted</td></tr>
+<tr><td class="mono-col">login-with-key</td><td>Non-interactive sign-in for CI</td></tr>
+<tr><td class="mono-col">whoami</td><td>Who am I signed in as</td></tr>
+<tr><td class="mono-col">logout</td><td>Remove stored credentials</td></tr>
+<tr><td class="mono-col">version</td><td>CLI version</td></tr>
+<tr><td class="mono-col">init</td><td>Scaffold a blank project &mdash; <strong>only when you explicitly ask</strong></td></tr>
+<tr><td class="mono-col">init-app-package</td><td>Scaffold an app package</td></tr>
+</tbody></table></div>
+
+<h3>By verb &mdash; and what each one can touch</h3>
+<div class="tbl"><table>
+<thead><tr><th>Prefix</th><th class="num-col">Count</th><th>What it means</th><th>Reach</th></tr></thead>
+<tbody>
+<tr><td class="mono-col">do-create-*</td><td class="num-col">31</td><td>Create a new local artifact file</td><td><span class="pill pill-warn">writes locally</span></td></tr>
+<tr><td class="mono-col">do-modify-*</td><td class="num-col">30</td><td>Patch a local file</td><td><span class="pill pill-warn">writes locally</span></td></tr>
+<tr><td class="mono-col">get-*</td><td class="num-col">30</td><td>Inspect and report</td><td><span class="pill pill-ok">read-only</span></td></tr>
+<tr><td class="mono-col">list-*</td><td class="num-col">29</td><td>List what is available</td><td><span class="pill pill-ok">read-only</span></td></tr>
+<tr><td class="mono-col">do-delete-*</td><td class="num-col">20</td><td>Delete an artifact</td><td><span class="pill pill-crit">destructive</span></td></tr>
+<tr><td class="mono-col">do-fetch-*</td><td class="num-col">15</td><td>Pull server state into a local file</td><td><span class="pill pill-crit">overwrites local</span></td></tr>
+<tr><td class="mono-col">do-add-*</td><td class="num-col">15</td><td>Add a sub-element (node, function, tool, topic)</td><td><span class="pill pill-warn">writes locally</span></td></tr>
+<tr><td class="mono-col">validate-*</td><td class="num-col">14</td><td>Check without changing</td><td><span class="pill pill-ok">read-only</span></td></tr>
+<tr><td class="mono-col">do-save-*</td><td class="num-col">14</td><td>Push a local file to the server as a draft</td><td><span class="pill pill-crit">writes to server</span></td></tr>
+<tr><td class="mono-col">do-update-*</td><td class="num-col">13</td><td>Update fields on a local file</td><td><span class="pill pill-warn">writes locally</span></td></tr>
+<tr><td class="mono-col">run-*</td><td class="num-col">9</td><td>Run a workflow, chat or test</td><td><span class="pill pill-warn">executes</span></td></tr>
+<tr><td class="mono-col">do-generate-*</td><td class="num-col">9</td><td>Generate content (descriptions, connectors, functions)</td><td><span class="pill pill-warn">writes locally</span></td></tr>
+<tr><td class="mono-col">do-remove-*</td><td class="num-col">9</td><td>Remove a sub-element</td><td><span class="pill pill-warn">writes locally</span></td></tr>
+<tr><td class="mono-col">search-*</td><td class="num-col">8</td><td>AI-assisted recommendations</td><td><span class="pill pill-ok">read-only</span></td></tr>
+<tr><td class="mono-col">do-publish-*</td><td class="num-col">2</td><td>Publish a policy or connector definition</td><td><span class="pill pill-crit">goes live</span></td></tr>
+</tbody></table></div>
+
+<p>The four to actually watch: <code>do-save-*</code>, <code>do-fetch-*</code>, <code>do-delete-*</code>, <code>do-publish-*</code>. Everything else stays on your laptop.</p>
+
+<h3>By artifact area</h3>
+<div class="tbl"><table>
+<thead><tr><th>Area</th><th>Typical commands</th></tr></thead>
+<tbody>
+<tr><td><strong>Apps</strong></td><td class="mono-col">do-create-app · do-add-agent · do-modify-agent-config · do-add-communication · do-add-template · do-add-action · do-modify-page-pattern · get-panel-metadata · validate-app · do-save-app</td></tr>
+<tr><td><strong>Workflows</strong></td><td class="mono-col">do-create-workflow · do-create-node · do-modify-node · do-modify-node-edges · do-delete-node · do-prettify-workflow · validate-workflow · get-workflow-node-structure · run-workflow · run-workflow-chat · do-save-workflow</td></tr>
+<tr><td><strong>Business objects</strong></td><td class="mono-col">do-create-bo · do-add-bo-function · do-create-bo-function-from-operation · do-add-bo-function-parameter · do-add-bo-function-example · get-business-object-functions · validate-bo · do-save-bo</td></tr>
+<tr><td><strong>Tools</strong></td><td class="mono-col">do-create-tool (business object, deeplink, document, email, external REST, MCP, connector) · do-update-tool · validate-tool · do-save-tool</td></tr>
+<tr><td><strong>Agents &amp; topics</strong></td><td class="mono-col">do-create-agent · do-add-agent-tool · do-add-agent-topic · do-create-topic · do-add-topic-instruction · validate-agent · validate-topic</td></tr>
+<tr><td><strong>Connectors</strong></td><td class="mono-col">do-generate-connector-definition · do-publish-connector-definition · prepare-connector-instance-create · do-create-connector-instance · do-save-connector-instance</td></tr>
+<tr><td><strong>Approvals</strong></td><td class="mono-col">do-create-approval-process · do-create-approval-rule · do-modify-approver-type · do-modify-notification-channel · search-approval-users · validate-approval-process</td></tr>
+<tr><td><strong>Policies</strong></td><td class="mono-col">do-create-policy · do-add-policy-documents · do-generate-policy-functions · do-create-policy-template · do-publish-policy · validate-policy</td></tr>
+<tr><td><strong>Testing</strong></td><td class="mono-col">get-workflow-test-sync-plan · do-generate-workflow-test · do-record-workflow-test · run-workflow-test · run-workflow-tests · get-workflow-test-final-summary · get-app-test-sync-plan · do-sync-app-tests · run-app-tests · get-app-test-final-summary</td></tr>
+<tr><td><strong>Cost optimisation</strong></td><td class="mono-col">list-workflow-model-configurations · get-workflow-model-override-targets · propose-sweep-candidates · run-optimization-sweep · analyze-token-usage · generate-optimization-report · compare-workflow-test-runs</td></tr>
+<tr><td><strong>Discovery (AI-assisted)</strong></td><td class="mono-col">search-business-objects · search-workflows · search-agents · search-deeplink-tools · search-external-rest-tools · search-document-tools · search-connector-definitions</td></tr>
+<tr><td><strong>Debugging</strong></td><td class="mono-col">get-nodes-executed-on-last-debug · get-debugger-results-for-nodes · list-pinned-outputs · do-modify-node-overrides · do-node-override-output · do-clear-node-override</td></tr>
+</tbody></table></div>
+
+<p>Any command will explain itself:</p>
+
+<div class="code"><div class="code-bar"><span class="lbl">Terminal</span><button class="copy" type="button">Copy</button></div>
+<pre><code>node .agents/skills/aistudio/scripts/aistudio.js do-create-app --help</code></pre></div>
+</section>
+
+<!-- ═══ 10 ══════════════════════════════════════════════════════════ -->
+<section id="apps">
+<h2><span class="sn">10</span><span>What you are actually building</span></h2>
+
+<p>Worth understanding what an agentic app <em>is</em>, because it is not what most people assume.</p>
+
+<figure>
+  <img src="images/03-what-is-an-agentic-app.webp" alt="Diagram: live business data is read by an agent workspace that spots what needs attention, explains why it matters and suggests what to do; it suggests to a human, who says yes; only then is a real record created in Fusion Applications. A bar under the first three stages reads: nothing on this side can change your data. The last stage is labelled one write.">
+  <figcaption><span class="fn">Fig. 25</span><span>Read the bar along the bottom: <span class="q">nothing on this side can change your data.</span> Exactly one stage writes.</span></figcaption>
+</figure>
+
+<p>The flow is: live business data &rarr; an agent workspace that spots what needs attention, explains why it matters, and suggests what to do &rarr; <strong>a human says yes</strong> &rarr; a real record is created in Fusion. The agent reads and reasons. Only a human approval turns that into a write.</p>
+
+<h3>The four pillars</h3>
+
+<p>Every feature in an agentic app is one of these four:</p>
+
+<div class="tbl"><table>
+<thead><tr><th>Pillar</th><th>What it does</th><th>How it appears</th></tr></thead>
+<tbody>
+<tr><td><strong>Information Displays</strong></td><td>Agent-generated visuals</td><td>Seven widget types via <code>&lt;oraInfoDisplay&gt;</code>. The agent produces structured metadata; Oracle renders it. The UI is never hardcoded.</td></tr>
+<tr><td><strong>Actionable Insights</strong></td><td>Turns analysis into execution</td><td>Each insight has a Title, Description, and agent-generated Execution Instructions. The agent that created an action owns running it.</td></tr>
+<tr><td><strong>Communications</strong></td><td>Outbound messaging</td><td>App-defined (template-based: PowerPoint, PDF, email, text) or agent-generated at runtime (email and text only). Always outbound &mdash; never intercepts incoming.</td></tr>
+<tr><td><strong>Ask Oracle Advisors</strong></td><td>The conversational layer</td><td>Answers combine text with full information displays. In Section Focus it scopes to only the agents powering that section, so a domain expert answers rather than a generalist.</td></tr>
+</tbody></table></div>
+
+<p>All four, on one screen:</p>
+
+<figure>
+  <img src="images/31-app-running-order-summary.webp" alt="The Sales Order Workspace showing an order summary and order lines on the left, fulfillment progress in the middle, and a right-hand rail with two priority actions and five communication formats.">
+  <figcaption><span class="fn">Fig. 26</span><span>Left: information displays. Right: priority actions on top, communications below. Ask Oracle across the top.</span></figcaption>
+</figure>
+
+<h3>The seven widget types</h3>
+<div class="tbl"><table>
+<thead><tr><th>Widget</th><th>patternId</th><th>Best for</th></tr></thead>
+<tbody>
+<tr><td>Chart</td><td class="mono-col">chartWidget</td><td>Trends over time, category comparisons, proportions</td></tr>
+<tr><td>Card</td><td class="mono-col">cardWidget</td><td>Single alerts, notifications, status with priority variants</td></tr>
+<tr><td>Message List</td><td class="mono-col">messageListWidget</td><td>Ordered lists of messages or alerts with priority badges</td></tr>
+<tr><td>Change List</td><td class="mono-col">changeListWidget</td><td>Before/after comparisons &mdash; current vs previous</td></tr>
+<tr><td>Multi Record</td><td class="mono-col">multiRecordWidget</td><td>Tables with sortable columns, row actions, bulk operations</td></tr>
+<tr><td>Record</td><td class="mono-col">recordWidget</td><td>A single record&rsquo;s details or key-value display</td></tr>
+<tr><td>Sankey</td><td class="mono-col">sankeyWidget</td><td>Flow visualisation &mdash; how quantities move between stages</td></tr>
+</tbody></table></div>
+
+<p>Three of them in one panel &mdash; a change list for shipped-versus-ordered, a card for the exception, and a footer of suggested actions:</p>
+
+<figure>
+  <img src="images/33-fulfillment-advisor-detail.webp" alt="The Fulfillment Advisor panel expanded, showing a fulfillment progress change list, a lagging shipment exception card, and three suggested action buttons.">
+  <figcaption><span class="fn">Fig. 27</span><span>The agent wrote no markup. It produced structured metadata; Oracle rendered it with its own components.</span></figcaption>
+</figure>
+
+<h3>The five-layer section structure</h3>
+
+<p>Every section in every agentic app follows the same shape. Users learn it once.</p>
+
+<div class="tbl"><table>
+<thead><tr><th class="num-col">Layer</th><th>Content</th><th>Example</th></tr></thead>
+<tbody>
+<tr><td class="num-col">1</td><td><strong>Headline</strong> &mdash; the single most important insight</td><td class="q">&ldquo;3 supplier contracts expire this week&rdquo;</td></tr>
+<tr><td class="num-col">2</td><td><strong>Short description</strong> &mdash; why it matters, what triggered it</td><td class="q">&ldquo;AcmeParts has the highest renewal risk based on SLA trends&rdquo;</td></tr>
+<tr><td class="num-col">3</td><td><strong>Content</strong> &mdash; detail via widgets</td><td>Lists, tables, cards, forms</td></tr>
+<tr><td class="num-col">4</td><td><strong>Visualisations</strong> &mdash; charts for trends</td><td>Bar, pie, line, Sankey</td></tr>
+<tr><td class="num-col">5</td><td><strong>Footer</strong> &mdash; sources plus suggested actions</td><td class="mono-col">[ Take Action ] [ Details ]</td></tr>
+</tbody></table></div>
+
+<figure>
+  <img src="images/32-app-running-light.webp" alt="The same Sales Order Workspace in light theme, showing headline, description, order lines table, a fulfillment status mix chart and the fulfillment exceptions below it.">
+  <figcaption><span class="fn">Fig. 28</span><span>Headline, why it matters, the detail, a chart, then the actions. Every panel, every app, same shape.</span></figcaption>
+</figure>
+
+<h3><code>$OraMessageHint</code> &mdash; how everything is triggered</h3>
+
+<p>This is the mechanism that makes the whole thing work. When something happens in an app, Oracle sends your workflow a value in <code>$context.$app.$OraMessageHint</code>, and your workflow branches on it &mdash; usually with a Switch node as the very first step.</p>
+
+<h4>Phase 1 &mdash; five hints fire in parallel the moment the app loads</h4>
+<div class="tbl"><table>
+<thead><tr><th>Hint</th><th>What it asks for</th></tr></thead>
+<tbody>
+<tr><td class="mono-col">InitSubtitle</td><td>The dynamic tagline &mdash; <span class="q">&ldquo;Good morning, Meg.&rdquo;</span></td></tr>
+<tr><td class="mono-col">Summary</td><td>A one- or two-sentence overview &mdash; <span class="q">&ldquo;3 items need review.&rdquo;</span></td></tr>
+<tr><td class="mono-col">InitDisplay</td><td>Render the widgets &mdash; charts, lists, cards</td></tr>
+<tr><td class="mono-col">InitActions</td><td>The priority insights &mdash; approve, review, act</td></tr>
+<tr><td class="mono-col">InitCommunications</td><td>Suggested messages &mdash; email, text, PDF</td></tr>
+</tbody></table></div>
+
+<p>They run in parallel, which is why a fully populated app appears in seconds.</p>
+
+<h4>Phase 2 &mdash; user-driven events</h4>
+<div class="tbl"><table>
+<thead><tr><th>Hint</th><th>Fired when</th><th>Extra context it gets</th></tr></thead>
+<tbody>
+<tr><td class="mono-col">Query</td><td>Someone asks Ask Oracle a question</td><td class="mono-col">$chatHistory</td></tr>
+<tr><td class="mono-col">InvokeAction</td><td>Someone clicks an action button</td><td class="mono-col">$OraAction</td></tr>
+<tr><td class="mono-col">FillParameters</td><td>A communication needs auto-filling</td><td class="mono-col">$OraCommsParamsToFill</td></tr>
+<tr><td class="mono-col">SendCommunication</td><td>A message is delivered</td><td>&mdash;</td></tr>
+<tr><td class="mono-col">AdditionalContent</td><td>A panel asks for more</td><td class="mono-col">$OraPanelName</td></tr>
+</tbody></table></div>
+
+<h3>Workflow teams vs supervisor teams</h3>
+<div class="tbl"><table>
+<thead><tr><th></th><th>Workflow Teams <span class="pill pill-ok">recommended</span></th><th>Supervisor Teams <span class="pill pill-warn">fallback</span></th></tr></thead>
+<tbody>
+<tr><td><strong>Shape</strong></td><td>Hint &rarr; Switch/Route &rarr; Agent &rarr; Structured output</td><td>Request &rarr; Supervisor picks workers &rarr; Workers</td></tr>
+<tr><td><strong>Routing</strong></td><td>Structured, via <code>$OraMessageHint</code></td><td>The supervisor decides at runtime</td></tr>
+<tr><td><strong>Latency</strong></td><td>Predictable</td><td>Less predictable</td></tr>
+<tr><td><strong>Risk</strong></td><td>Low</td><td>Can make excessive LLM calls</td></tr>
+<tr><td><strong>Use for</strong></td><td>Production apps</td><td>Quick prototypes, edge cases</td></tr>
+</tbody></table></div>
+
+<p>Use workflows for production. Also worth knowing: <strong>only published workflows get invoked</strong>.</p>
+
+<h3>The decisions that matter</h3>
+<div class="tbl"><table>
+<thead><tr><th>Decision</th><th>What to do</th></tr></thead>
+<tbody>
+<tr><td>Team type</td><td>Workflow first. Supervisor only for dynamic multi-turn collaboration.</td></tr>
+<tr><td>One agent or many</td><td><strong>Many, always.</strong> Specialised agents per domain beat one generalist.</td></tr>
+<tr><td>Team granularity</td><td>Break into smaller topic areas; combine at the app level.</td></tr>
+<tr><td>Context passing</td><td><strong>Pass explicitly</strong> via <code>$context.$system.$inputMessage</code>. Never assume it arrives on its own.</td></tr>
+<tr><td>Terminal workflow paths</td><td>End with an Agent or LLM node, not Code or Output, so streaming works later.</td></tr>
+<tr><td>Communication type</td><td>Templates for documents (PowerPoint, PDF); agent-generated for ad-hoc email and text.</td></tr>
+<tr><td>Action invocation</td><td><code>ora.Invoke()</code> for defined workflows; <code>ora.Agent()</code> for ad-hoc commands.</td></tr>
+<tr><td>Drill-down navigation</td><td><code>ora.App.launch()</code> or the Navigate to App action step.</td></tr>
+<tr><td><strong>Response time</strong></td><td><strong>60-second hard limit.</strong> Minimise LLM and Agent nodes. Test latency in Preview.</td></tr>
+</tbody></table></div>
+
+<div class="note key">
+  <h4>The 60-second limit shapes everything else</h4>
+  <p>It is why deterministic workflows beat improvising supervisors, and why the agent is stingy with LLM nodes. If your app is slow, that is the constraint you are hitting.</p>
+</div>
+</section>
+
+<!-- ═══ 11 ══════════════════════════════════════════════════════════ -->
+<section id="trouble">
+<h2><span class="sn">11</span><span>Things that go wrong, and the fix</span></h2>
+
+<div class="tbl"><table>
+<thead><tr><th>Problem</th><th>What is happening</th><th>Fix</th></tr></thead>
+<tbody>
+<tr><td>Claude Code cannot see the skills</td><td>They are only in <code>.agents/skills/</code></td><td>Do <a href="#s5">Step 5</a>. Confirm with <code>ls -la .claude/skills</code>.</td></tr>
+<tr><td><code>AUTH_REQUIRED</code> in a JSON response</td><td>Your token expired or was never set</td><td>Do not treat that JSON as the answer. Run the <code>interactiveCommand</code> it returns in a real terminal, then retry. Never paste a raw password into a command.</td></tr>
+<tr><td>Password prompt never appears</td><td>Some terminal UIs cannot show hidden prompts</td><td>Run <code>configure-basic-auth</code> in a real terminal, or authorise <code>--password-stdin</code> explicitly. Never write a password into <code>env.properties</code>.</td></tr>
+<tr><td>The agent scaffolded a blank project</td><td>It ran <code>init</code> when it should not have</td><td>Put &ldquo;Do NOT run <code>init</code> unless I explicitly ask&rdquo; in <code>CLAUDE.md</code>. <code>init</code> is only for genuinely empty projects.</td></tr>
+<tr><td>&ldquo;This app has been modified on the server&rdquo;</td><td>The server copy diverged from yours</td><td><strong>Refresh from Server</strong> to take theirs, <strong>Cancel</strong> to think. Only <strong>Override Server</strong> if you are certain.</td></tr>
+<tr><td>&ldquo;found artifact files using legacy extensions&rdquo;</td><td>You are on <code>.app</code>/<code>.dl</code>/<code>.approval</code>; newer is <code>.apps</code>/<code>.deeplink</code>/<code>.approvalProcess</code></td><td><strong>Migrate</strong> if you are starting fresh. <strong>Skip</strong> if existing tooling depends on the old names.</td></tr>
+<tr><td>Agent asks which app package to use</td><td>You have more than one under <code>app-pkg/</code></td><td>Name it in your request. The skill deliberately will not guess.</td></tr>
+<tr><td>A <code>.wf</code> edit broke after a CLI command</td><td>Shell quoting ate an expression like <code>$context</code> or <code>{{...}}</code></td><td>Use a file-backed patch: <code>--inputs-patch @.debug/my-inputs.json</code>. Then validate.</td></tr>
+<tr><td>Workflow test says &ldquo;remote judge&rdquo;</td><td>A CI npm script leaked in</td><td>Never pass <code>--judge-provider remote</code> unless you mean it. Never use npm scripts for tests.</td></tr>
+<tr><td>Agent will not publish a workflow</td><td>Correct behaviour</td><td>Publishing a workflow is deliberately UI-only. Do it in Fusion.</td></tr>
+<tr><td>App runs slowly or times out</td><td>You are near the 60-second ceiling</td><td>Reduce LLM and Agent nodes. Run <code>analyze-token-usage</code>. Move logic into Code nodes.</td></tr>
+</tbody></table></div>
+</section>
+
+<!-- ═══ 12 ══════════════════════════════════════════════════════════ -->
+<section id="updates">
+<h2><span class="sn">12</span><span>Keeping it up to date</span></h2>
+
+<p>Oracle ships updates to this repo. The change log at the top of the README tells you what moved. Four folders, three of which get replaced:</p>
+
+<div class="tbl"><table>
+<thead><tr><th>Folder</th><th>On update</th></tr></thead>
+<tbody>
+<tr><td class="mono-col">aiapps/</td><td><span class="pill pill-warn">replace</span> with the latest from the repo</td></tr>
+<tr><td class="mono-col">.agents/skills/aistudio/</td><td><span class="pill pill-warn">replace</span></td></tr>
+<tr><td class="mono-col">.agents/skills/aistudio-apps-*/</td><td><span class="pill pill-warn">replace</span> all of them</td></tr>
+<tr><td class="mono-col">src/</td><td><span class="pill pill-ok">never touched</span> &mdash; this is your work</td></tr>
+</tbody></table></div>
+
+<div class="code"><div class="code-bar"><span class="lbl">Terminal &mdash; the update routine</span><button class="copy" type="button">Copy</button></div>
+<pre><code><span class="c"># 1. get the latest</span>
+cd ~/fusion-ai-repo/fusion-ai-studio
+git pull
+
+<span class="c"># 2. replace the samples</span>
+rm -rf ~/fusion-ai-workspace/aiapps
+cp -R release-26C/aiapps ~/fusion-ai-workspace/
+
+<span class="c"># 3. replace the skills (unzip the new ones first)</span>
+rm -rf ~/fusion-ai-workspace/.agents/skills/aistudio
+cp -R &lt;newly-unzipped&gt;/aistudio ~/fusion-ai-workspace/.agents/skills/
+
+<span class="c"># 4. reinstall the extension from the new .vsix (Install from VSIX again)</span></code></pre></div>
+
+<p>If you used <strong>symlinks</strong> in Step 5, <code>.claude/skills/</code> picks the update up automatically. If you <strong>copied</strong>, re-copy now. This is the reason symlinks are worth the extra minute.</p>
+
+<hr>
+
+<h2 style="margin-top:3.5rem"><span class="sn">&mdash;</span><span>The part that actually matters</span></h2>
+
+<p>Setup is maybe forty minutes. But the setup is not the interesting bit.</p>
+
+<p>The interesting bit is that Oracle wrote down their own expertise as files a machine can read, and put a boundary between the AI and the running system. The AI writes files. Oracle checks the files. Oracle builds the screens. A human approves anything that changes a record.</p>
+
+<figure>
+  <img src="images/34-five-rules-closing.webp" alt="Closing summary: how you ship agents when a wrong answer is not an option — spec first, one gated write, discover first, fixed structure, checks pass. Not Oracle-specific.">
+  <figcaption><span class="fn">Fig. 29</span><span>The five rules are not Oracle-specific. Use them on whatever you build next.</span></figcaption>
+</figure>
+
+<p>That is how you ship agents when a wrong answer is not an option. The spec comes first. One gated write action. Discover before you build. Structure over improvisation. Unvalidated means unfinished.</p>
+
+<h3>Links</h3>
+<ul>
+  <li><a href="https://github.com/oracle/fusion-ai-studio">Oracle&rsquo;s repo &mdash; github.com/oracle/fusion-ai-studio</a></li>
+  <li><a href="https://docs.oracle.com/en/cloud/saas/fusion-ai/">Oracle Fusion AI documentation</a></li>
+  <li><a href="https://www.oracle.com/applications/fusion-ai/">Oracle Fusion AI product page</a></li>
+  <li><a href="https://claude.com/claude-code">Claude Code</a></li>
+  <li>In the repo: <code>release-26C/how-to/install-and-use-fusion-ai-studio-CLI_vscode-codex.md</code>, <code>how-to-configure-oauth-for-aistudio-cli.md</code>, <code>how-to-uptake-incremental-updates.md</code></li>
+</ul>
+
+<footer class="pagefoot">
+  <div>
+    <p class="who">Baig Mohammed</p>
+    <p class="role">Oracle Fusion &amp; enterprise AI · <a href="https://github.com/mabaig">github.com/mabaig</a></p>
+    <p class="said">I wrote this while working through the 26C CLI myself, on macOS, in Claude Code. Every figure is either a diagram drawn for this guide or a screenshot taken during that run &mdash; nothing here is borrowed.</p>
+  </div>
+  <div class="fl">
+    <a href="https://github.com/mabaig/fusion-ai-studio-guide">Source for this guide</a>
+    <a href="https://github.com/oracle/fusion-ai-studio">oracle/fusion-ai-studio</a>
+    <a href="https://claude.com/claude-code">Claude Code</a>
+  </div>
+</footer>
+
+<p style="font-family:var(--mono);font-size:.71875rem;color:var(--muted);margin-top:1.75rem">
+Tested against <code>release-26C</code> · CLI version <code>1.0.1784919021375</code> · 288 CLI commands · 3 skills · 30 prompt references · 27 node prompts. Independent guide, not affiliated with Oracle.
+</p>
+</section>
+
+</div>
+</main>
+</div>
+
+<script>
+// copy buttons
+document.querySelectorAll(".code").forEach(function (block) {
+  var btn = block.querySelector(".copy");
+  var pre = block.querySelector("pre");
+  if (!btn || !pre) return;
+  btn.addEventListener("click", function () {
+    var text = pre.innerText;
+    var done = function () {
+      btn.textContent = "Copied";
+      btn.dataset.done = "1";
+      setTimeout(function () {
+        btn.textContent = "Copy";
+        delete btn.dataset.done;
+      }, 1600);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done, function () {
+        btn.textContent = "Select and copy";
+        setTimeout(function () { btn.textContent = "Copy"; }, 2000);
+      });
+    } else {
+      btn.textContent = "Select and copy";
+      setTimeout(function () { btn.textContent = "Copy"; }, 2000);
+    }
+  });
+});
+
+// highlight the section currently in view in the rail
+(function () {
+  var links = Array.prototype.slice.call(document.querySelectorAll(".rail nav a"));
+  var targets = links
+    .map(function (a) { return document.querySelector(a.getAttribute("href")); })
+    .filter(Boolean);
+  if (!targets.length || !("IntersectionObserver" in window)) return;
+
+  var visible = new Set();
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (e.isIntersecting) visible.add(e.target.id);
+      else visible.delete(e.target.id);
+    });
+    var current = targets.filter(function (t) { return visible.has(t.id); })[0];
+    links.forEach(function (a) {
+      a.classList.toggle("on", !!current && a.getAttribute("href") === "#" + current.id);
+    });
+  }, { rootMargin: "-15% 0px -70% 0px" });
+
+  targets.forEach(function (t) { io.observe(t); });
+})();
+</script>
