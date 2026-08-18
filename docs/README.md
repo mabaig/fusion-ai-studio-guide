@@ -23,7 +23,14 @@ figures (the individual rule cards).
 ### View the web page
 
 Just open `index.html` in a browser — it is a single self-contained file with no build step
-and no dependencies. The only thing it needs is the `images/` folder next to it.
+and no dependencies. It needs the `images/`, `img/` and `social/` folders next to it.
+
+The page has a scroll-linked ambience layer: a drifting particle field and a rotating Oracle mark
+across the hero, a document-wide progress rail, reveal-on-scroll, and a gentle depth effect on the
+figures. It is deliberately front-loaded — the field fades out over the first one-and-a-half
+viewports and the animation loop then stops drawing entirely, so a long read costs nothing. It
+honours `prefers-reduced-motion`, and there is an **Ambience** toggle at the bottom of the sidebar
+that persists your choice.
 
 To serve it locally:
 

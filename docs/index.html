@@ -1,30 +1,32 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Fusion Agentic Apps from the Terminal</title>
-<meta name="description" content="A step-by-step guide to the Oracle AI Agent Studio CLI running inside Claude Code, for Oracle Fusion release 26C.">
+<title>Oracle AI Agent Studio CLI + Claude Code &mdash; a Fusion 26C walkthrough</title>
+<meta name="description" content="Oracle put its Fusion AI Agent Studio expertise in a public repo as files a coding agent reads. A tested, step-by-step walkthrough of the 26C AI Agent Studio CLI driven from Claude Code — setup, IDCS OAuth, first build, and the AI/ERP boundary underneath.">
 <meta name="author" content="Baig Mohammed">
 <meta name="theme-color" content="#11131A" media="(prefers-color-scheme:dark)">
 <meta name="theme-color" content="#FCFCFD" media="(prefers-color-scheme:light)">
+<link rel="icon" type="image/png" href="img/favicon.png">
+<link rel="apple-touch-icon" href="img/oracle-mark.png">
 
 <link rel="canonical" href="https://mabaig.github.io/fusion-ai-studio-guide">
 <meta property="og:type" content="article">
 <meta property="article:author" content="https://github.com/mabaig">
 <meta property="og:site_name" content="Oracle AI Agent Studio CLI + Claude Code">
-<meta property="og:title" content="I built a Fusion agentic app by typing one paragraph">
+<meta property="og:title" content="Oracle Let the AI Write the Files. It Kept the Checks for Itself.">
 <meta property="og:description" content="Oracle put its own AI Agent Studio expertise in a public repo. Every step of driving it from Claude Code, including the one Oracle's guide leaves out.">
 <meta property="og:url" content="https://mabaig.github.io/fusion-ai-studio-guide">
 <meta property="og:image" content="https://mabaig.github.io/fusion-ai-studio-guide/social/og-card.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="I built a Fusion agentic app by typing one paragraph — and the five rules: spec first, one gated write, discover first, fixed structure, checks pass.">
+<meta property="og:image:alt" content="Oracle Let the AI Write the Files. It Kept the Checks for Itself. — and the five rules: spec first, one gated write, discover first, fixed structure, checks pass.">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="I built a Fusion agentic app by typing one paragraph">
+<meta name="twitter:title" content="Oracle Let the AI Write the Files. It Kept the Checks for Itself.">
 <meta name="twitter:description" content="Every step of driving the Oracle AI Agent Studio CLI from Claude Code, for Fusion release 26C.">
 <meta name="twitter:image" content="https://mabaig.github.io/fusion-ai-studio-guide/social/og-card.png">
 
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"TechArticle",
- "headline":"I built a Fusion agentic app by typing one paragraph",
+ "headline":"Oracle Let the AI Write the Files. It Kept the Checks for Itself.",
  "description":"A step-by-step guide to the Oracle AI Agent Studio CLI running inside Claude Code, for Oracle Fusion release 26C.",
  "author":{"@type":"Person","name":"Baig Mohammed","url":"https://github.com/mabaig"},
  "image":"https://mabaig.github.io/fusion-ai-studio-guide/social/og-card.png",
@@ -358,7 +360,7 @@ figcaption .fn{color:var(--accent);white-space:nowrap}
 
 /* ─── responsive ─────────────────────────────────────────────────────── */
 @media (max-width:64rem){
-  .shell{grid-template-columns:1fr}
+  .shell{grid-template-columns:minmax(0,1fr)}
   .rail{
     position:static;height:auto;border-right:0;border-bottom:1px solid var(--rule);
     padding:1.5rem clamp(1.25rem,4vw,2rem);
@@ -375,7 +377,89 @@ figcaption .fn{color:var(--accent);white-space:nowrap}
   .rule-row{grid-template-columns:1fr;gap:.5rem}
   .rule-row .rn{font-size:1.75rem}
 }
+
+/* ═══ ambience ═══════════════════════════════════════════════════════════
+   Hero-scoped immersion: a drifting particle field and a rotating Oracle
+   mark that shed flecks as you scroll, both fading out before the body copy
+   starts. Kept off the reading surface on purpose. */
+/* long inline code (paths, urns, versions) must be allowed to break, or a
+   single unbreakable token pushes the whole document wider than the viewport */
+:not(pre) > code{white-space:normal;overflow-wrap:anywhere}
+body{overflow-wrap:break-word}
+
+#ambient,#flecks{
+  position:fixed;inset:0;width:100%;height:100%;
+  pointer-events:none;z-index:0;
+}
+.shell{position:relative;z-index:1}
+.core{
+  position:fixed;left:50%;top:56vh;width:clamp(96px,10vw,148px);aspect-ratio:1;
+  pointer-events:none;z-index:0;perspective:800px;
+  will-change:transform,opacity;
+}
+.core img{width:100%;height:100%;display:block;filter:drop-shadow(0 0 34px rgba(240,180,41,.28))}
+.progress-rail{
+  position:fixed;top:0;left:0;height:2px;width:0;z-index:60;
+  background:linear-gradient(90deg,var(--accent),#E8776B);
+  box-shadow:0 0 12px color-mix(in srgb,var(--accent) 55%,transparent);
+  transition:width .09s linear;
+}
+.cursor-aura{
+  position:fixed;left:0;top:0;width:380px;height:380px;margin:-190px 0 0 -190px;
+  border-radius:50%;pointer-events:none;z-index:0;opacity:0;
+  background:radial-gradient(circle,color-mix(in srgb,var(--accent) 16%,transparent) 0%,transparent 66%);
+}
+.credit{
+  position:fixed;right:1rem;bottom:1rem;z-index:55;
+  display:flex;align-items:center;gap:.55rem;
+  padding:.5rem .7rem;border:1px solid var(--rule-strong);border-radius:100px;
+  background:color-mix(in srgb,var(--ground) 86%,transparent);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  font-family:var(--mono);font-size:.6875rem;line-height:1.25;color:var(--muted);
+  text-decoration:none;
+}
+.credit:hover{border-color:var(--accent)}
+.credit img{width:17px;height:17px;flex:none}
+.credit b{color:var(--ink);font-weight:600;letter-spacing:.01em}
+.credit span{display:block;font-size:.625rem;opacity:.8}
+@media (max-width:34rem){.credit{right:.6rem;bottom:.6rem;padding:.42rem .6rem}.credit .hide-xs{display:none}}
+@media (max-width:48rem){.core{display:none}}
+
+/* reveal-on-scroll */
+.rv{opacity:0;transform:translateY(26px);
+  transition:opacity .75s cubic-bezier(.16,1,.3,1),transform .75s cubic-bezier(.16,1,.3,1)}
+.rv.in{opacity:1;transform:none}
+figure img{transition:box-shadow .5s ease}
+
+/* ambience toggle in the rail */
+.amb-toggle{
+  margin-top:1.25rem;width:100%;cursor:pointer;
+  display:flex;align-items:center;justify-content:space-between;gap:.5rem;
+  padding:.45rem .6rem;border:1px solid var(--rule);border-radius:4px;
+  background:0;color:var(--muted);font-family:var(--mono);font-size:.6875rem;
+}
+.amb-toggle:hover{border-color:var(--rule-strong);color:var(--ink)}
+.amb-toggle .sw{width:22px;height:12px;border-radius:100px;background:var(--rule-strong);position:relative;flex:none}
+.amb-toggle .sw::after{content:"";position:absolute;top:2px;left:2px;width:8px;height:8px;border-radius:50%;background:var(--ground);transition:transform .18s ease}
+.amb-toggle[aria-pressed="true"] .sw{background:var(--accent)}
+.amb-toggle[aria-pressed="true"] .sw::after{transform:translateX(10px)}
+
+@media (prefers-reduced-motion:reduce){
+  .rv{opacity:1;transform:none}
+  #ambient,#flecks,.core,.cursor-aura{display:none}
+}
 </style>
+
+<canvas id="ambient" aria-hidden="true"></canvas>
+<canvas id="flecks" aria-hidden="true"></canvas>
+<div class="core" aria-hidden="true"><img src="img/oracle-mark.png" alt=""></div>
+<div class="cursor-aura" id="cursorAura" aria-hidden="true"></div>
+<div class="progress-rail" id="progressRail" aria-hidden="true"></div>
+
+<a class="credit" href="https://github.com/mabaig" title="Independent guide — not affiliated with Oracle">
+  <img src="img/oracle-mark.png" alt="">
+  <span class="hide-xs" style="font-size:.6875rem"><b>Baig Mohammed</b><span>Independent &middot; not affiliated with Oracle</span></span>
+</a>
 
 <div class="shell">
 
@@ -401,6 +485,9 @@ figcaption .fn{color:var(--accent);white-space:nowrap}
     <p style="margin:0 0 .5rem">Tested against <code style="font-size:.9em">release-26C</code> · CLI <code style="font-size:.9em">1.0.1784919021375</code></p>
     <p style="margin:0 0 .5rem"><a href="https://github.com/oracle/fusion-ai-studio">oracle/fusion-ai-studio</a></p>
     <p style="margin:0">by <a href="https://github.com/mabaig">Baig Mohammed</a></p>
+    <button class="amb-toggle" id="ambToggle" type="button" aria-pressed="true">
+      <span>Ambience</span><span class="sw"></span>
+    </button>
   </div>
 </aside>
 
@@ -409,11 +496,11 @@ figcaption .fn{color:var(--accent);white-space:nowrap}
 
 <header class="masthead">
   <p class="eyebrow"><span>Oracle Fusion 26C</span><span>AI Agent Studio CLI</span><span>Claude Code</span></p>
-  <h1>I built a Fusion agentic app by typing one paragraph</h1>
-  <p class="dek">Oracle put its own AI Agent Studio expertise on GitHub as files a coding agent can read. Here is every step to use it.</p>
+  <h1>Oracle Let the AI Write the Files. <br>It Kept the Checks for Itself.</h1>
+  <p class="dek">Inside Fusion 26C&rsquo;s AI Agent Studio CLI &mdash; the boundary that makes agentic apps safe on real ERP data, and every step of driving it from Claude Code.</p>
   <p class="byline">
     <span class="who">By <a href="https://github.com/mabaig">Baig Mohammed</a></span>
-    <span>Step-by-step guide</span><span>~40 minutes of setup</span><span>Works with no Fusion environment</span>
+    <span>Step-by-step guide</span><span>~40 minutes of setup</span><span>No Fusion instance needed to follow along</span>
   </p>
 </header>
 
@@ -1755,5 +1842,230 @@ document.querySelectorAll(".code").forEach(function (block) {
   }, { rootMargin: "-15% 0px -70% 0px" });
 
   targets.forEach(function (t) { io.observe(t); });
+})();
+</script>
+
+<script>
+/* ═══ ambience ═══════════════════════════════════════════════════════════
+   Hero-scoped particle field + rotating Oracle core, a document-wide scroll
+   rail, reveal-on-scroll and a gentle depth dolly on figures.
+
+   The expensive parts run ONLY while the hero is on screen. Past ~1.5
+   viewports the field opacity hits zero and the loop stops drawing, so a long
+   read costs nothing. Honours prefers-reduced-motion and the rail toggle. */
+(function () {
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var stored = null;
+  try { stored = localStorage.getItem('ambience'); } catch (e) {}
+  var on = stored === null ? !reduce : stored === '1';
+
+  var ambient = document.getElementById('ambient');
+  var flecksC = document.getElementById('flecks');
+  var core    = document.querySelector('.core');
+  var coreImg = core && core.querySelector('img');
+  var aura    = document.getElementById('cursorAura');
+  var rail    = document.getElementById('progressRail');
+  var toggle  = document.getElementById('ambToggle');
+  var fine    = matchMedia('(pointer:fine)').matches;
+
+  /* ---------- reveal on scroll (always on; cheap, and unobserves) -------- */
+  var targets = document.querySelectorAll('section > h2, figure, .note, .duo, .tbl, .code, .step, .tree, .pagefoot');
+  for (var i = 0; i < targets.length; i++) targets[i].classList.add('rv');
+  if ('IntersectionObserver' in window) {
+    var ro = new IntersectionObserver(function (es) {
+      es.forEach(function (e) {
+        if (e.isIntersecting) { e.target.classList.add('in'); ro.unobserve(e.target); }
+      });
+    }, { threshold: 0.08, rootMargin: '0px 0px -6% 0px' });
+    for (var j = 0; j < targets.length; j++) ro.observe(targets[j]);
+  } else {
+    for (var k = 0; k < targets.length; k++) targets[k].classList.add('in');
+  }
+
+  /* ---------- scroll rail + figure dolly (cheap, always on) -------------- */
+  var figs = [].slice.call(document.querySelectorAll('figure'));
+  var ticking = false;
+  function onScroll() {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(function () {
+      var y = window.scrollY || 0;
+      var docH = document.documentElement.scrollHeight - innerHeight;
+      rail.style.width = (docH > 0 ? (y / docH) * 100 : 0) + '%';
+      if (!reduce) {
+        var vh = innerHeight;
+        for (var i = 0; i < figs.length; i++) {
+          var f = figs[i], r = f.getBoundingClientRect();
+          if (r.bottom < -vh * 0.5 || r.top > vh * 1.5) continue;  /* skip far-away */
+          var c = r.top + r.height / 2;
+          var p = Math.min(1, Math.abs(c - vh / 2) / (vh / 2 + r.height / 2));
+          var e = p * p * (3 - 2 * p);
+          var img = f.querySelector('img');
+          if (img) img.style.transform = 'scale(' + (1 - e * 0.018).toFixed(4) + ')';
+          f.style.opacity = (1 - e * 0.32).toFixed(3);
+        }
+      }
+      ticking = false;
+    });
+  }
+  addEventListener('scroll', onScroll, { passive: true });
+  addEventListener('resize', onScroll);
+  onScroll();
+
+  /* ---------- the hero field (the only expensive part) ------------------- */
+  var actx = ambient.getContext('2d'), fctx = flecksC.getContext('2d');
+  var W, H, DPR, parts = [], flecks = [], t = 0, running = false;
+  var mouse = { x: -9e9, y: -9e9, tx: -9e9, ty: -9e9 };
+  var PAL = ['#F0B429', '#E8A33D', '#D98A4F', '#C9B27A', '#8C94A3'];
+
+  function resize() {
+    DPR = Math.min(devicePixelRatio || 1, 2);
+    W = innerWidth; H = innerHeight;
+    [ambient, flecksC].forEach(function (c) {
+      c.width = Math.floor(W * DPR); c.height = Math.floor(H * DPR);
+      c.getContext('2d').setTransform(DPR, 0, 0, DPR, 0, 0);
+    });
+    var n = Math.min(64, Math.floor((W * H) / 26000));   /* modest density */
+    parts = [];
+    for (var i = 0; i < n; i++) {
+      var d = 0.3 + Math.random() * 0.7;
+      parts.push({ x: Math.random() * W, y: Math.random() * H,
+        vx: (Math.random() - 0.5) * 0.22, vy: (Math.random() - 0.5) * 0.22,
+        r: (0.6 + Math.random() * 1.9) * d, d: d,
+        c: PAL[(Math.random() * PAL.length) | 0], tw: Math.random() * 6.28 });
+    }
+  }
+
+  function rgba(hex, a) {
+    var n = parseInt(hex.slice(1), 16);
+    return 'rgba(' + ((n >> 16) & 255) + ',' + ((n >> 8) & 255) + ',' + (n & 255) + ',' + a + ')';
+  }
+
+  var lastY = 0, vSmooth = 0, ang = 0;
+  function spawn(n, vel, ox, oy, rad) {
+    for (var i = 0; i < n && flecks.length < 420; i++) {
+      var a = Math.random() * 6.283, rr = rad * (0.6 + Math.random() * 0.6);
+      var sp = 0.5 + Math.random() * 1.8 + Math.min(Math.abs(vel) * 0.04, 2.6);
+      flecks.push({ x: ox + Math.cos(a) * rr, y: oy + Math.sin(a) * rr,
+        vx: Math.cos(a) * sp, vy: Math.sin(a) * sp + vel * 0.015,
+        life: 0, max: 34 + Math.random() * 46, len: 3 + Math.random() * 7,
+        wid: 1 + Math.random() * 1.8, rot: a, spin: (Math.random() - 0.5) * 0.2,
+        c: PAL[(Math.random() * PAL.length) | 0] });
+    }
+  }
+
+  function frame() {
+    if (!running) return;
+    var y = window.scrollY || 0;
+    var vel = y - lastY; lastY = y;
+    vSmooth += (vel - vSmooth) * 0.25;
+
+    /* fade the whole ambience out across the first 1.5 viewports */
+    var fade = Math.max(0, 1 - y / (H * 1.5));
+    ambient.style.opacity = flecksC.style.opacity = fade.toFixed(3);
+    core.style.opacity = fade.toFixed(3);
+    if (aura) aura.style.opacity = (fine ? fade * 0.9 : 0).toFixed(3);
+
+    if (fade <= 0.01) {                 /* off screen: stop all drawing */
+      actx.clearRect(0, 0, W, H); fctx.clearRect(0, 0, W, H);
+      requestAnimationFrame(frame); return;
+    }
+
+    t += 0.008;
+    mouse.x += (mouse.tx - mouse.x) * 0.08;
+    mouse.y += (mouse.ty - mouse.y) * 0.08;
+
+    /* particle field */
+    actx.clearRect(0, 0, W, H);
+    actx.globalCompositeOperation = 'lighter';
+    for (var i = 0; i < parts.length; i++) {
+      var p = parts[i];
+      p.vx += Math.cos(p.y * 0.004 + t) * 0.002;
+      p.vy += Math.sin(p.x * 0.004 + t) * 0.002;
+      var dx = mouse.x - p.x, dy = mouse.y - p.y, d2 = dx * dx + dy * dy;
+      if (d2 < 26000) {
+        var f = (1 - d2 / 26000) * 0.32 * p.d, dd = Math.sqrt(d2 + 1);
+        p.vx += (dx / dd) * f; p.vy += (dy / dd) * f;
+      }
+      p.vx *= 0.96; p.vy *= 0.96; p.x += p.vx; p.y += p.vy;
+      if (p.x < -20) p.x = W + 20; else if (p.x > W + 20) p.x = -20;
+      if (p.y < -20) p.y = H + 20; else if (p.y > H + 20) p.y = -20;
+      var tw = 0.55 + 0.45 * Math.sin(t * 2 + p.tw), glow = p.r * 5.5;
+      var g = actx.createRadialGradient(p.x, p.y, 0, p.x, p.y, glow);
+      g.addColorStop(0, rgba(p.c, 0.5 * tw)); g.addColorStop(1, rgba(p.c, 0));
+      actx.fillStyle = g;
+      actx.beginPath(); actx.arc(p.x, p.y, glow, 0, 6.283); actx.fill();
+    }
+    /* constellation lines, only while clearly visible */
+    if (fade > 0.25) {
+      actx.lineWidth = 0.6;
+      for (var a1 = 0; a1 < parts.length; a1++) {
+        for (var b1 = a1 + 1; b1 < parts.length; b1++) {
+          var ax = parts[a1].x - parts[b1].x, ay = parts[a1].y - parts[b1].y;
+          var dd2 = ax * ax + ay * ay;
+          if (dd2 < 15000) {
+            actx.strokeStyle = rgba('#C9B27A', (1 - dd2 / 15000) * 0.16 * fade);
+            actx.beginPath(); actx.moveTo(parts[a1].x, parts[a1].y);
+            actx.lineTo(parts[b1].x, parts[b1].y); actx.stroke();
+          }
+        }
+      }
+    }
+    actx.globalCompositeOperation = 'source-over';
+
+    /* the core: drifts right of the headline, spins, sheds flecks */
+    var cw = core.offsetWidth || 120;
+    var offX = Math.min(W * 0.30, W / 2 - cw * 0.9);
+    core.style.transform = 'translate(-50%,-50%) translate(' + offX.toFixed(1) + 'px,0)';
+    ang += 0.26 + vel * 0.14;
+    if (coreImg) coreImg.style.transform = 'rotateX(12deg) rotateY(' + ang.toFixed(2) + 'deg)';
+
+    var ox = W / 2 + offX, oy = H * 0.56;
+    if (Math.abs(vSmooth) > 0.5) spawn(Math.min(((Math.abs(vSmooth) * 0.6) | 0) + 1, 12), vSmooth, ox, oy, cw * 0.5);
+
+    fctx.clearRect(0, 0, W, H);
+    fctx.globalCompositeOperation = 'lighter';
+    for (var q = flecks.length - 1; q >= 0; q--) {
+      var fl = flecks[q];
+      if (++fl.life >= fl.max) { flecks.splice(q, 1); continue; }
+      fl.x += fl.vx; fl.y += fl.vy; fl.vx *= 0.965; fl.vy *= 0.965; fl.rot += fl.spin;
+      var kk = 1 - fl.life / fl.max;
+      fctx.save(); fctx.translate(fl.x, fl.y); fctx.rotate(fl.rot);
+      fctx.globalAlpha = kk * kk; fctx.fillStyle = fl.c;
+      fctx.beginPath(); fctx.ellipse(0, 0, fl.len / 2, fl.wid / 2, 0, 0, 6.283); fctx.fill();
+      fctx.restore();
+    }
+    fctx.globalAlpha = 1; fctx.globalCompositeOperation = 'source-over';
+    requestAnimationFrame(frame);
+  }
+
+  if (fine) addEventListener('pointermove', function (e) {
+    mouse.tx = e.clientX; mouse.ty = e.clientY;
+    if (aura) aura.style.transform = 'translate(' + e.clientX + 'px,' + e.clientY + 'px)';
+  }, { passive: true });
+  addEventListener('resize', resize);
+
+  function start() {
+    resize(); lastY = window.scrollY || 0;
+    running = true; requestAnimationFrame(frame);
+    [ambient, flecksC, core].forEach(function (el) { el.style.display = ''; });
+  }
+  function stop() {
+    running = false; flecks.length = 0;
+    if (W) { actx.clearRect(0, 0, W, H); fctx.clearRect(0, 0, W, H); }
+    [ambient, flecksC, core].forEach(function (el) { el.style.display = 'none'; });
+    if (aura) aura.style.opacity = 0;
+  }
+
+  if (toggle) {
+    toggle.setAttribute('aria-pressed', on ? 'true' : 'false');
+    toggle.addEventListener('click', function () {
+      on = !on;
+      toggle.setAttribute('aria-pressed', on ? 'true' : 'false');
+      try { localStorage.setItem('ambience', on ? '1' : '0'); } catch (e) {}
+      on ? start() : stop();
+    });
+  }
+  on ? start() : stop();
 })();
 </script>

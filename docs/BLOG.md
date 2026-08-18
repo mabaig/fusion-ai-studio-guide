@@ -1,6 +1,6 @@
-# I Built a Fusion Agentic App by Typing One Paragraph. Here Is Exactly How.
+# Oracle Let the AI Write the Files. It Kept the Checks for Itself.
 
-### A step-by-step guide to the Oracle AI Agent Studio CLI, running inside Claude Code
+### Inside Fusion 26C's AI Agent Studio CLI — the boundary that makes agentic apps safe on real ERP data, and every step of driving it from Claude Code.
 
 ---
 
