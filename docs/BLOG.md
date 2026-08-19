@@ -115,9 +115,9 @@ edits or renames the rest.
 The rename clause matters more than it looks: other artifacts call those by name. The most expensive
 agent in a big company is the one that rebuilds something that already existed.
 
-**04 - Graph the path you know. Loop the one you do not.**
+**04 - Know which shape you are in.**
 
-![Practice 04 - graph the path you know, loop the one you do not: fixed edges versus a model choosing its next action](images/07-practice-04-graph-or-loop.webp)
+![Practice 04 - know which shape you are in: fixed edges versus a model choosing its next action](images/07-practice-04-graph-or-loop.webp)
 
 Two shapes, and they are not interchangeable. A **graph** is fixed nodes and edges - resolve the
 request, fetch the data, let the model reason, return an answer. Same input, same path, and when it
@@ -136,7 +136,8 @@ supervisor teams, compared in [§10](#10-agentic-apps-explained).
 This is where the two earn their keep together. Run the loop where exploration is cheap and a human
 is watching - at build time, in the terminal - then freeze the path it proved into a graph that runs
 in production. Where a single step stays genuinely open-ended, put a bounded loop inside one graph
-node with a hard cap on iterations.
+node. Oracle makes that bound required: an Agent node with tools must declare `maxInteractions`, an
+integer from 1 to 20, so an unbounded agentic loop is not authorable.
 
 That way the graph owns control flow and the loop owns only local judgement. It is also exactly what
 this guide does: a loop in Claude Code, driving validated commands, to produce a graph that ships.
@@ -1220,7 +1221,7 @@ The interesting bit is that Oracle wrote down their own expertise as files a mac
 
 ![Closing summary: spec first, one gated write, discover first, fixed structure, checks pass](images/34-practices-closing.webp)
 
-That is how you ship agents when a wrong answer is not an option. Agree the contract before any code. Read-only until a human opens the gate. Discover first, and leave what you find alone. Graph the path you know, loop the one you do not. Loop to learn, graph to ship. Validation is the definition of done.
+That is how you ship agents when a wrong answer is not an option. Agree the contract before any code. Read-only until a human opens the gate. Discover first, and leave what you find alone. Know which shape you are in. Loop to learn, graph to ship. Validation is the definition of done.
 
 Not one of those six is Oracle-specific. Use them on whatever you build next.
 

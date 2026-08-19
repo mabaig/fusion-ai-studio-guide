@@ -616,7 +616,7 @@ figure img{transition:box-shadow .5s ease}
   <div class="rule-row">
     <div class="rn">04</div>
     <div>
-      <h3>Graph the path you know. Loop the one you do not.</h3>
+      <h3>Know which shape you are in</h3>
       <p>Two shapes, and they are not interchangeable. A <strong>graph</strong> is fixed nodes and edges - resolve the request, fetch the data, let the model reason, return an answer. Same input, same path, and when it breaks you know which node broke. A <strong>loop</strong> is the model choosing its next action, seeing the result, and choosing again until it decides it is finished.</p>
       <p class="home">The loop handles problems whose shape you cannot predict. It also wanders, costs an unpredictable number of turns, and cannot be held to a latency budget. The mistake is rarely picking the wrong one - it is not knowing which one you are in. Oracle draws the same line as workflow teams versus supervisor teams, compared in <a href="#apps">&sect;10</a>.</p>
     </div>
@@ -626,7 +626,7 @@ figure img{transition:box-shadow .5s ease}
     <div class="rn">05</div>
     <div>
       <h3>Loop to learn, graph to ship</h3>
-      <p>This is where the two earn their keep together. Run the loop where exploration is cheap and a human is watching - at build time, in the terminal - then freeze the path it proved into a graph that runs in production. Where a single step stays genuinely open-ended, put a bounded loop inside one graph node with a hard cap on iterations.</p>
+      <p>This is where the two earn their keep together. Run the loop where exploration is cheap and a human is watching - at build time, in the terminal - then freeze the path it proved into a graph that runs in production. Where a single step stays genuinely open-ended, put a bounded loop inside one graph node. Oracle makes that bound required: an Agent node with tools must declare <code>maxInteractions</code>, an integer from 1 to 20, so an unbounded agentic loop is not authorable.</p>
       <p class="home">That way the graph owns control flow and the loop owns only local judgement. It is also exactly what this guide does: a loop in Claude Code, driving validated commands, to produce a graph that ships.</p>
     </div>
   </div>
@@ -643,7 +643,7 @@ figure img{transition:box-shadow .5s ease}
 </div>
 
 <figure>
-  <img src="images/07-practice-04-graph-or-loop.webp" alt="Practice 04: graph the path you know, loop the one you do not. A graph is fixed nodes and edges, so the same input takes the same path and a failure names its node. A loop is the model choosing its next action until it decides it is done: flexible, and prone to wandering.">
+  <img src="images/07-practice-04-graph-or-loop.webp" alt="Practice 04: know which shape you are in. A graph is fixed nodes and edges, so the same input takes the same path and a failure names its node. A loop is the model choosing its next action until it decides it is done: flexible, and prone to wandering.">
   <figcaption><span class="fn">Fig. 5</span><span>The one practice most teams get backwards: knowing which shape you are in.</span></figcaption>
 </figure>
 </section>
@@ -1766,7 +1766,7 @@ cp -R &lt;newly-unzipped&gt;/aistudio ~/fusion-ai-workspace/.agents/skills/
   <figcaption><span class="fn">Fig. 29</span><span>None of the six is Oracle-specific. Use them on whatever you build next.</span></figcaption>
 </figure>
 
-<p>That is how you ship agents when a wrong answer is not an option. Agree the contract before any code. Read-only until a human opens the gate. Discover first, and leave what you find alone. Graph the path you know, loop the one you do not. Loop to learn, graph to ship. Validation is the definition of done.</p>
+<p>That is how you ship agents when a wrong answer is not an option. Agree the contract before any code. Read-only until a human opens the gate. Discover first, and leave what you find alone. Know which shape you are in. Loop to learn, graph to ship. Validation is the definition of done.</p>
 
 <h3>Links</h3>
 <ul>

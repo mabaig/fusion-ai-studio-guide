@@ -293,7 +293,7 @@ RULES = [
       "renames the rest, because other artifacts call those by name."],
      "the most expensive agent rebuilds what already existed"),
     ("07-practice-04-graph-or-loop", "04",
-     [("Graph the path you know. ", INK), ("Loop the one you do not.", ACC)],
+     [("Know which shape ", INK), ("you are in.", ACC)],
      ["A graph is fixed nodes and edges: same input, same path, and when it",
       "breaks you know which node broke. A loop is the model choosing its next",
       "action until it decides it is done: flexible, and prone to wandering."],
