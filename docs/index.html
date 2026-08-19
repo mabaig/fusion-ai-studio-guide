@@ -889,7 +889,7 @@ Copy-Item -Recurse .agents\skills\* .claude\skills\</code></pre></div>
 
 <h4>OAuth / token authentication &mdash; required for production</h4>
 
-<p>This one is a two-place job: register a public client in Oracle IDCS, then register its Application ID back in AI Agent Studio.</p>
+<p>This one is a two-place job: register a public client in Oracle IDCS, then register its Client ID back in AI Agent Studio.</p>
 
 <p><strong>In IDCS &mdash; Integrated applications &rarr; Add application &rarr; Mobile Application.</strong> Save it, open the <strong>OAuth configuration</strong> tab, then click <strong>Edit OAuth configuration</strong>:</p>
 
@@ -918,7 +918,7 @@ Copy-Item -Recurse .agents\skills\* .claude\skills\</code></pre></div>
   <figcaption><span class="fn">Fig. 16</span><span>Both scopes carry your environment name: <code>urn:opc:resource:fusion:&lt;your-env&gt;:fusion-ai/</code> and <code>&hellip;:boss/</code>.</span></figcaption>
 </figure>
 
-<p><strong>Then in AI Agent Studio &mdash; Credentials &rarr; AI Studio CLI &rarr; Enable AI Studio CLI.</strong> The page spells out the same nine steps and gives you the field to paste the generated <strong>Application ID</strong> into:</p>
+<p><strong>Then in AI Agent Studio &mdash; Credentials &rarr; AI Studio CLI &rarr; Enable AI Studio CLI.</strong> The page spells out the same nine steps and ends at the field it labels <strong>Application ID</strong>:</p>
 
 <figure>
   <img src="images/22-ai-studio-cli-idcs-steps.webp" alt="The AI Studio CLI tab in AI Agent Studio Credentials, listing Oracle's nine IDCS registration steps above the Application ID field.">
@@ -926,8 +926,8 @@ Copy-Item -Recurse .agents\skills\* .claude\skills\</code></pre></div>
 </figure>
 
 <div class="note stop">
-  <h4>Heads up on the naming</h4>
-  <p>That field is labelled <strong>Application ID</strong>, and Oracle&rsquo;s step 9 on the same page says to paste the generated Application ID. Oracle&rsquo;s <em>written</em> how-to (<code>how-to-configure-oauth-for-aistudio-cli.md</code>) talks about the <strong>Client ID</strong> from the OAuth configuration tab instead. If <code>authenticate</code> later fails, that mismatch is the first thing to check.</p>
+  <h4>Paste the Client ID, not the Application ID</h4>
+  <p>The field is labelled <strong>Application ID</strong>, but that is not the value it wants. Paste the <strong>Client ID</strong> from your IDCS app&rsquo;s <strong>OAuth configuration</strong> tab. Oracle&rsquo;s own how-to (<code>how-to-configure-oauth-for-aistudio-cli.md</code>) says it outright: <em>&ldquo;The Application ID shown on the details page is not used for the CLI configuration described later. Use the Client ID from the OAuth configuration tab instead.&rdquo;</em> Their checklist repeats it &mdash; <em>AI Studio uses the IDCS Client ID, not the IDCS Application ID</em>. The label is misleading; pasting the Application ID is the most common reason <code>authenticate</code> fails.</p>
 </div>
 
 <p>Save it, and the page hands you the finished <code>env.properties</code> &mdash; with a copy button:</p>
