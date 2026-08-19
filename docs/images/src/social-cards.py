@@ -31,7 +31,7 @@ DEK = ["Inside Fusion 26C's AI Agent Studio CLI — the boundary",
 RULES = [("01", "Spec first"), ("02", "One gated write"), ("03", "Discover first"),
          ("04", "Fixed structure"), ("05", "Checks pass")]
 AUTHOR = "Baig Mohammed"
-HANDLE = "github.com/mabaig"
+HANDLE = "linkedin.com/in/mbaig162"
 
 
 def t(x, y, s, size=14, fill=INK, font=SANS, w=400, anchor="start", ls=None):

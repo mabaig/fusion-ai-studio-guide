@@ -364,7 +364,7 @@ Note the wording on that last prompt: *encrypted in workspace env.properties; CL
 shared OS secret store*. The password never lands anywhere in plain text.
 
 **OAuth / Token Authentication** — required for production. This one is a two-place job: register a
-public client in Oracle IDCS, then register its Application ID back in AI Agent Studio.
+public client in Oracle IDCS, then register its Client ID back in AI Agent Studio.
 
 **In IDCS — Integrated applications → Add application → Mobile Application.** Save it, open the
 **OAuth configuration** tab, and click **Edit OAuth configuration**:
@@ -388,14 +388,17 @@ Both scopes carry your environment name — `urn:opc:resource:fusion:<your-env>:
 `urn:opc:resource:fusion:<your-env>:boss/`. Leave **Add app roles** off.
 
 **Then in AI Agent Studio — Credentials → AI Studio CLI → Enable AI Studio CLI.** The page spells
-out the same nine steps and gives you the field to paste the generated **Application ID** into:
+out the same nine steps and ends at the field it labels **Application ID**:
 
 ![The AI Studio CLI tab with Oracle's nine IDCS steps and the Application ID field](images/22-ai-studio-cli-idcs-steps.webp)
 
-**Heads up on the naming.** That field is labelled **Application ID**, and Oracle's step 9 on the
-same page says to paste the generated Application ID. Oracle's *written* how-to
-(`how-to-configure-oauth-for-aistudio-cli.md`) talks about the **Client ID** from the OAuth
-configuration tab instead. If `authenticate` later fails, that mismatch is the first thing to check.
+**Paste the Client ID, not the Application ID.** The field is labelled **Application ID**, but that
+is not the value it wants. Paste the **Client ID** from your IDCS app's **OAuth configuration** tab.
+Oracle's own how-to (`how-to-configure-oauth-for-aistudio-cli.md`) says it outright: *"The
+Application ID shown on the details page is not used for the CLI configuration described later. Use
+the Client ID from the OAuth configuration tab instead."* Their checklist repeats it — *AI Studio
+uses the IDCS Client ID, not the IDCS Application ID*. The label is misleading; pasting the
+Application ID is the most common reason `authenticate` fails.
 
 Save it, and the page hands you the finished `env.properties` — with a copy button:
 
