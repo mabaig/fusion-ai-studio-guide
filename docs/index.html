@@ -21,7 +21,7 @@ if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t)
 <meta property="og:image" content="https://mabaig.github.io/fusion-ai-studio-guide/social/og-card.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Oracle Let the AI Write the Files. It Kept the Checks for Itself. - and the five rules: spec first, one gated write, discover first, fixed structure, checks pass.">
+<meta property="og:image:alt" content="Oracle Let the AI Write the Files. It Kept the Checks for Itself. - and the six practices: contract first, read-only default, discover first, graph or loop, loop then graph, checks pass.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Oracle Let the AI Write the Files. It Kept the Checks for Itself.">
 <meta name="twitter:description" content="Every step of driving the Oracle AI Agent Studio CLI from Claude Code, for Fusion release 26C.">
@@ -289,7 +289,7 @@ td code{white-space:nowrap}
 .pill-warn{color:var(--warn);border-color:color-mix(in srgb,var(--warn) 45%,transparent);background:color-mix(in srgb,var(--warn) 10%,transparent)}
 .pill-crit{color:var(--crit);border-color:color-mix(in srgb,var(--crit) 45%,transparent);background:color-mix(in srgb,var(--crit) 9%,transparent)}
 
-/* ─── the five rules ─────────────────────────────────────────────────── */
+/* ─── the six practices ──────────────────────────────────────────────── */
 .rules{margin:2rem 0 2.5rem;border-top:1px solid var(--rule-strong)}
 .rule-row{
   display:grid;grid-template-columns:4.5rem 1fr;gap:1.5rem;
@@ -465,7 +465,7 @@ figure img{transition:box-shadow .5s ease}
     <ol>
       <li><a href="#what"><span class="n">01</span><span>What this actually is</span></a></li>
       <li><a href="#who"><span class="n">02</span><span>Who this is for</span></a></li>
-      <li><a href="#rules"><span class="n">03</span><span>The five rules</span></a></li>
+      <li><a href="#rules"><span class="n">03</span><span>The six practices</span></a></li>
       <li><a href="#before"><span class="n">04</span><span>Before you start</span></a></li>
       <li><a href="#setup"><span class="n">05</span><span>Setup, steps 1&ndash;10</span></a></li>
       <li><a href="#build"><span class="n">06</span><span>First build, steps 11&ndash;16</span></a></li>
@@ -568,74 +568,83 @@ figure img{transition:box-shadow .5s ease}
   </div>
   <div class="card">
     <h4>Everyone else</h4>
-    <p>Stay for the five rules. They apply to any agent you build, on any platform.</p>
+    <p>Stay for the six practices. They apply to any agent you build, on any platform.</p>
   </div>
 </div>
 
 <figure>
-  <img src="images/10-who-this-is-for.webp" alt="Three audiences and how far each one gets: anyone stops at a validated file, Fusion Applications customers get all the way to live for real users, and everyone else stops at the five rules. No Fusion environment is needed to build and validate.">
+  <img src="images/10-who-this-is-for.webp" alt="Three audiences and how far each one gets: anyone stops at a validated file, Fusion Applications customers get all the way to live for real users, and everyone else stops at the six practices. No Fusion environment is needed to build and validate.">
   <figcaption><span class="fn">Fig. 4</span><span>Three audiences, three different stopping points.</span></figcaption>
 </figure>
 </section>
 
 <!-- ═══ 03 ══════════════════════════════════════════════════════════ -->
 <section id="rules">
-<h2><span class="sn">03</span><span>The five rules that make this work</span></h2>
+<h2><span class="sn">03</span><span>The six practices that make this work</span></h2>
 
-<p>Oracle did not just ship a tool. They shipped a set of habits, baked into the skill files. This is the part worth stealing even if you never touch Fusion.</p>
+<p>Oracle did not just ship a tool. They shipped a set of habits, baked into the skill files. Read them as agent engineering practice rather than Fusion trivia - every one of them takes a decision away from the model and hands it to a human or a check, and that holds anywhere a wrong answer costs something.</p>
 
 <div class="rules">
 
   <div class="rule-row">
     <div class="rn">01</div>
     <div>
-      <h3>The spec comes first</h3>
+      <h3>Agree the contract before any code</h3>
       <p>Nothing gets built until the plan is written down and you agree to it. Two screens, three panels, four detail views, and an explicit list of what it will <em>not</em> build yet.</p>
-      <p class="home">At home we say &ldquo;build me an HR app&rdquo; and hope. Here the agent hands you a written plan and waits.</p>
+      <p class="home">Arguing with a paragraph is free. Arguing with a generated build is a rebuild.</p>
     </div>
   </div>
 
   <div class="rule-row">
     <div class="rn">02</div>
     <div>
-      <h3>One gated write action</h3>
-      <p>Out of the box the app can look, but never change anything. Click around, dig in, ask questions - all read-only. The one action that touches real HR data has to be switched on by hand, and it asks before it does anything.</p>
-      <p class="home">Twelve tools and write access to everything, wired up on a Sunday, is how you get an incident.</p>
+      <h3>Read-only until a human opens the gate</h3>
+      <p>Out of the box the app can look, but never change anything. Click around, dig in, ask questions - all read-only. Every action that touches a real record is named, switched on by hand, and asks before it fires.</p>
+      <p class="home">Least privilege expressed as a default, not as a policy document. Twelve tools with write access, wired up on a Sunday, is how you get an incident.</p>
     </div>
   </div>
 
   <div class="rule-row">
     <div class="rn">03</div>
     <div>
-      <h3>Discover before you build</h3>
-      <p>The agent searches your files first, finds the workflows that already exist, and reuses them. It only builds what is genuinely missing, and it never edits or renames the rest.</p>
-      <p class="home">The most expensive agent in a big company is the one that rebuilds something that already existed.</p>
+      <h3>Discover first, and leave what you find alone</h3>
+      <p>The agent searches the workspace before it creates anything, finds the workflows and business objects that already exist, and reuses them. It builds only what is genuinely missing, and it never edits or renames the rest.</p>
+      <p class="home">The rename clause matters more than it looks: other artifacts call those by name. The most expensive agent in a big company is the one that rebuilds something that already existed.</p>
     </div>
   </div>
 
   <div class="rule-row">
     <div class="rn">04</div>
     <div>
-      <h3>Structure over improvisation</h3>
-      <p>Open one of these workflows and the agent is not making it up as it goes. The steps are fixed: work out what was asked, go get the data, let the model think, send back an answer. And it has <strong>sixty seconds</strong> to finish.</p>
-      <p class="home">One prompt, one model, and hope for the best. When speed and correctness both matter, fixed steps win.</p>
+      <h3>Graph the path you know. Loop the one you do not.</h3>
+      <p>Two shapes, and they are not interchangeable. A <strong>graph</strong> is fixed nodes and edges - resolve the request, fetch the data, let the model reason, return an answer. Same input, same path, and when it breaks you know which node broke. A <strong>loop</strong> is the model choosing its next action, seeing the result, and choosing again until it decides it is finished.</p>
+      <p class="home">The loop handles problems whose shape you cannot predict. It also wanders, costs an unpredictable number of turns, and cannot be held to a latency budget. The mistake is rarely picking the wrong one - it is not knowing which one you are in. Oracle draws the same line as workflow teams versus supervisor teams, compared in <a href="#apps">&sect;10</a>.</p>
     </div>
   </div>
 
   <div class="rule-row">
     <div class="rn">05</div>
     <div>
-      <h3>Unvalidated means unfinished</h3>
+      <h3>Loop to learn, graph to ship</h3>
+      <p>This is where the two earn their keep together. Run the loop where exploration is cheap and a human is watching - at build time, in the terminal - then freeze the path it proved into a graph that runs in production. Where a single step stays genuinely open-ended, put a bounded loop inside one graph node with a hard cap on iterations.</p>
+      <p class="home">That way the graph owns control flow and the loop owns only local judgement. It is also exactly what this guide does: a loop in Claude Code, driving validated commands, to produce a graph that ships.</p>
+    </div>
+  </div>
+
+  <div class="rule-row">
+    <div class="rn">06</div>
+    <div>
+      <h3>Validation is the definition of done</h3>
       <p>When the build finishes, the agent does not announce that it is done. It runs the checks first. If the checks have not passed, the skill treats the work as unfinished and fixes it before anything else.</p>
-      <p class="home">Your agent saying &ldquo;done&rdquo; is not proof. The checks passing is.</p>
+      <p class="home">An agent saying &ldquo;done&rdquo; is a prediction about its own output. A check passing is evidence. Only one of those is worth trusting.</p>
     </div>
   </div>
 
 </div>
 
 <figure>
-  <img src="images/09-five-rules-summary.webp" alt="The five rules, each in one line: the spec comes first - agree the plan in writing; one gated write action - it can look, not touch; discover before you build - find what exists, protect it; structure over improvisation - the model works inside fixed steps; unvalidated means unfinished - done means the checks passed.">
-  <figcaption><span class="fn">Fig. 5</span><span>How you ship agents when a wrong answer is not an option.</span></figcaption>
+  <img src="images/07-practice-04-graph-or-loop.webp" alt="Practice 04: graph the path you know, loop the one you do not. A graph is fixed nodes and edges, so the same input takes the same path and a failure names its node. A loop is the model choosing its next action until it decides it is done: flexible, and prone to wandering.">
+  <figcaption><span class="fn">Fig. 5</span><span>The one practice most teams get backwards: knowing which shape you are in.</span></figcaption>
 </figure>
 </section>
 
@@ -1022,7 +1031,7 @@ node .agents/skills/aistudio/scripts/aistudio.js whoami</code></pre></div>
 - Keep everything local. Only fetch, save, publish or push when I explicitly ask.
 - Never publish a workflow from the CLI.
 - After a material edit, run the matching `validate-*` command.
-  Unvalidated means unfinished.
+  Validation is the definition of done.
 - Never write a raw password into env.properties, command arguments, files or logs.
 
 ## Layout
@@ -1152,7 +1161,7 @@ Now wiring the graph.
 
 <figure>
   <img src="images/27-workflow-visual-editor.webp" alt="The Fusion AI Studio visual workflow editor showing a fulfilment workflow graph: resolve order number, resolve order, has order condition, get order lines or order not found, get actionable holds, get info holds.">
-  <figcaption><span class="fn">Fig. 21</span><span>Resolve the order &rarr; <em>has order?</em> &rarr; get the lines, or return <strong>Order Not Found</strong>. No improvisation, and sixty seconds to finish.</span></figcaption>
+  <figcaption><span class="fn">Fig. 21</span><span>Resolve the order &rarr; <em>has order?</em> &rarr; get the lines, or return <strong>Order Not Found</strong>. Every edge on the page before anything runs.</span></figcaption>
 </figure>
 
 <p>Click a <code>.apps</code> file and you get the app editor - the same one that exists in the Fusion UI:</p>
@@ -1753,11 +1762,11 @@ cp -R &lt;newly-unzipped&gt;/aistudio ~/fusion-ai-workspace/.agents/skills/
 <p>The interesting bit is that Oracle wrote down their own expertise as files a machine can read, and put a boundary between the AI and the running system. The AI writes files. Oracle checks the files. Oracle builds the screens. A human approves anything that changes a record.</p>
 
 <figure>
-  <img src="images/34-five-rules-closing.webp" alt="Closing summary: how you ship agents when a wrong answer is not an option - spec first, one gated write, discover first, fixed structure, checks pass. Not Oracle-specific.">
-  <figcaption><span class="fn">Fig. 29</span><span>The five rules are not Oracle-specific. Use them on whatever you build next.</span></figcaption>
+  <img src="images/34-practices-closing.webp" alt="Closing summary: how you ship agents when a wrong answer is not an option - contract first, read-only default, discover first, graph or loop, loop then graph, checks pass. Not Oracle-specific.">
+  <figcaption><span class="fn">Fig. 29</span><span>None of the six is Oracle-specific. Use them on whatever you build next.</span></figcaption>
 </figure>
 
-<p>That is how you ship agents when a wrong answer is not an option. The spec comes first. One gated write action. Discover before you build. Structure over improvisation. Unvalidated means unfinished.</p>
+<p>That is how you ship agents when a wrong answer is not an option. Agree the contract before any code. Read-only until a human opens the gate. Discover first, and leave what you find alone. Graph the path you know, loop the one you do not. Loop to learn, graph to ship. Validation is the definition of done.</p>
 
 <h3>Links</h3>
 <ul>

@@ -22,7 +22,7 @@ I ran the whole thing in **Claude Code**. This guide is every step, in order, wi
 
 1. [What this actually is](#1-what-this-actually-is)
 2. [Who this is for](#2-who-this-is-for)
-3. [The five rules that make this work](#3-the-five-rules-that-make-this-work)
+3. [The six practices that make this work](#3-the-six-practices-that-make-this-work)
 4. [Before you start](#4-before-you-start)
 5. [Step-by-step setup (Steps 1–10)](#5-step-by-step-setup)
 6. [Your first build (Steps 11–16)](#6-your-first-build)
@@ -68,57 +68,89 @@ Oracle's own guide is written for **Codex**. Everything works the same in **Clau
 
 ## 2. Who this is for
 
-![Three audiences and how far each one gets: a validated file, live for real users, or the five rules](images/10-who-this-is-for.webp)
+![Three audiences and how far each one gets: a validated file, live for real users, or the six practices](images/10-who-this-is-for.webp)
 
 **Anyone.** Clone the repo, read the skills, run the CLI on your own laptop. Free. You can build and validate app files with no Fusion environment at all.
 
 **Fusion Applications customers.** You can go all the way — publish and put the app in front of real users.
 
-**Everyone else.** Stay for the five rules. They apply to any agent you build, on any platform.
+**Everyone else.** Stay for the six practices. They apply to any agent you build, on any platform.
 
 ---
 
-## 3. The five rules that make this work
+## 3. The six practices that make this work
 
-Oracle did not just ship a tool. They shipped a set of habits, baked into the skill files. This is the part worth stealing even if you never touch Fusion.
+Oracle did not just ship a tool. They shipped a set of habits, baked into the skill files. Read them
+as agent engineering practice rather than Fusion trivia - every one of them takes a decision away
+from the model and hands it to a human or a check, and that holds anywhere a wrong answer costs
+something.
 
-**Rule 1 — The spec comes first.**
+**01 - Agree the contract before any code.**
 
-![Rule 01 — the spec comes first: nothing gets built until the plan is written down and agreed](images/04-rule-01-spec-first.webp)
+![Practice 01 - agree the contract before any code: a written scope, including what it will not build yet](images/04-practice-01-contract.webp)
 
-Nothing gets built until the plan is written down and you agree to it. Two screens, three panels, four detail views, and an explicit list of what it will *not* build yet.
+Nothing gets built until the plan is written down and you agree to it. Two screens, three panels,
+four detail views, and an explicit list of what it will *not* build yet.
 
-At home we say "build me an HR app" and hope. Here the agent hands you a written plan and waits.
+Arguing with a paragraph is free. Arguing with a generated build is a rebuild.
 
-**Rule 2 — One gated write action.**
+**02 - Read-only until a human opens the gate.**
 
-![Rule 02 — one gated write action: read-only out of the box, and the one write has to be switched on by hand](images/05-rule-02-one-gated-write.webp)
+![Practice 02 - read-only until a human opens the gate: every write is named, enabled by hand, and asks first](images/05-practice-02-read-only.webp)
 
-Out of the box the app can look, but never change anything. Click around, dig in, ask questions — all read-only. The one action that touches real HR data has to be switched on by hand, and it asks before it does anything.
+Out of the box the app can look, but never change anything. Click around, dig in, ask questions -
+all read-only. Every action that touches a real record is named, switched on by hand, and asks
+before it fires.
 
-**Rule 3 — Discover before you build.**
+Least privilege expressed as a default, not as a policy document.
 
-![Rule 03 — discover before you build: search the workspace first, reuse what exists, never edit or rename it](images/06-rule-03-discover-first.webp)
+**03 - Discover first, and leave what you find alone.**
 
-The agent searches your files first, finds the workflows that already exist, and reuses them. It only builds what is genuinely missing, and it never edits or renames the rest.
+![Practice 03 - discover first and leave what you find alone: search, reuse, never rename](images/06-practice-03-discover.webp)
 
-The most expensive agent in a big company is the one that rebuilds something that already existed.
+The agent searches the workspace before it creates anything, finds the workflows and business
+objects that already exist, and reuses them. It builds only what is genuinely missing, and it never
+edits or renames the rest.
 
-**Rule 4 — Structure over improvisation.**
+The rename clause matters more than it looks: other artifacts call those by name. The most expensive
+agent in a big company is the one that rebuilds something that already existed.
 
-![Rule 04 — structure over improvisation: the workflow steps are fixed and the model works inside them](images/07-rule-04-structure.webp)
+**04 - Graph the path you know. Loop the one you do not.**
 
-Open one of these workflows and the agent is not making it up as it goes. The steps are fixed: work out what was asked, go get the data, let the model think, send back an answer. And it has **sixty seconds** to finish.
+![Practice 04 - graph the path you know, loop the one you do not: fixed edges versus a model choosing its next action](images/07-practice-04-graph-or-loop.webp)
 
-**Rule 5 — Unvalidated means unfinished.**
+Two shapes, and they are not interchangeable. A **graph** is fixed nodes and edges - resolve the
+request, fetch the data, let the model reason, return an answer. Same input, same path, and when it
+breaks you know which node broke. A **loop** is the model choosing its next action, seeing the
+result, and choosing again until it decides it is finished.
 
-![Rule 05 — unvalidated means unfinished: the checks run before the agent reports done](images/08-rule-05-unvalidated.webp)
+The loop handles problems whose shape you cannot predict. It also wanders, costs an unpredictable
+number of turns, and cannot be held to a latency budget. The mistake is rarely picking the wrong one
+- it is not knowing which one you are in. Oracle draws the same line as workflow teams versus
+supervisor teams, compared in [§10](#10-agentic-apps-explained).
 
-When the build finishes, the agent does not announce that it is done. It runs the checks first. If the checks have not passed, the skill treats the work as unfinished and fixes it before anything else.
+**05 - Loop to learn, graph to ship.**
 
-Your agent saying "done" is not proof. The checks passing is.
+![Practice 05 - loop to learn, graph to ship: explore in the loop, then freeze the proven path into a graph](images/08-practice-05-loop-to-graph.webp)
 
-![The five rules, each in one line](images/09-five-rules-summary.webp)
+This is where the two earn their keep together. Run the loop where exploration is cheap and a human
+is watching - at build time, in the terminal - then freeze the path it proved into a graph that runs
+in production. Where a single step stays genuinely open-ended, put a bounded loop inside one graph
+node with a hard cap on iterations.
+
+That way the graph owns control flow and the loop owns only local judgement. It is also exactly what
+this guide does: a loop in Claude Code, driving validated commands, to produce a graph that ships.
+
+**06 - Validation is the definition of done.**
+
+![Practice 06 - validation is the definition of done: the checks run before the agent reports done](images/09-practice-06-validated.webp)
+
+When the build finishes, the agent does not announce that it is done. It runs the checks first. If
+the checks have not passed, the skill treats the work as unfinished and fixes it before anything
+else.
+
+An agent saying "done" is a prediction about its own output. A check passing is evidence. Only one
+of those is worth trusting.
 
 ---
 
@@ -485,7 +517,7 @@ Optional, but it saves you a lot of repetition. Create `CLAUDE.md` in your works
 - Discover and reuse before creating. Treat every existing artifact as read-only.
 - Keep everything local. Only fetch, save, publish or push when I explicitly ask.
 - Never publish a workflow from the CLI.
-- After a material edit, run the matching `validate-*` command. Unvalidated means unfinished.
+- After a material edit, run the matching `validate-*` command. Validation is the definition of done.
 - Never write a raw password into env.properties, command arguments, files or logs.
 
 ## Layout
@@ -1186,11 +1218,11 @@ Setup is maybe forty minutes. But the setup is not the interesting bit.
 
 The interesting bit is that Oracle wrote down their own expertise as files a machine can read, and put a boundary between the AI and the running system. The AI writes files. Oracle checks the files. Oracle builds the screens. A human approves anything that changes a record.
 
-![Closing summary: spec first, one gated write, discover first, fixed structure, checks pass](images/34-five-rules-closing.webp)
+![Closing summary: spec first, one gated write, discover first, fixed structure, checks pass](images/34-practices-closing.webp)
 
-That is how you ship agents when a wrong answer is not an option. The spec comes first. One gated write action. Discover before you build. Structure over improvisation. Unvalidated means unfinished.
+That is how you ship agents when a wrong answer is not an option. Agree the contract before any code. Read-only until a human opens the gate. Discover first, and leave what you find alone. Graph the path you know, loop the one you do not. Loop to learn, graph to ship. Validation is the definition of done.
 
-Those five rules are not Oracle-specific. Use them on whatever you build next.
+Not one of those six is Oracle-specific. Use them on whatever you build next.
 
 ---
 

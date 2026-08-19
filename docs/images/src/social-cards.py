@@ -26,10 +26,10 @@ MONO = "SF Mono, Menlo, Consolas, monospace"
 
 HEAD_A = "Oracle let the AI write the files."
 HEAD_B = "It kept the checks for itself."
-DEK = ["Inside Fusion 26C's AI Agent Studio CLI — the boundary",
+DEK = ["Inside Fusion 26C's AI Agent Studio CLI - the boundary",
        "that makes agentic apps safe on real ERP data."]
-RULES = [("01", "Spec first"), ("02", "One gated write"), ("03", "Discover first"),
-         ("04", "Fixed structure"), ("05", "Checks pass")]
+RULES = [("01", "Contract first"), ("02", "Read-only"), ("03", "Discover first"),
+         ("04", "Graph or loop"), ("05", "Loop then graph"), ("06", "Checks pass")]
 AUTHOR = "Baig Mohammed"
 HANDLE = "linkedin.com/in/mbaig162"
 
@@ -67,7 +67,7 @@ def card(name, out_dir, W, H):
     # five-rule strip
     sy = H - 168
     b.append(line(P, sy, W - P, sy, RULE))
-    cw = (W - 2 * P) / 5
+    cw = (W - 2 * P) / len(RULES)
     for i, (n, lab) in enumerate(RULES):
         x = P + i * cw
         if i:

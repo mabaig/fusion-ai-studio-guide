@@ -1,0 +1,12 @@
+11-repo-at-a-glance 900 452
+01-workspace-side 900 516
+02-oracle-side 900 516
+10-who-this-is-for 900 372
+04-practice-01-contract 900 296
+05-practice-02-read-only 900 296
+06-practice-03-discover 900 296
+07-practice-04-graph-or-loop 900 296
+08-practice-05-loop-to-graph 900 296
+09-practice-06-validated 900 296
+03-what-is-an-agentic-app 900 384
+34-practices-closing 900 396

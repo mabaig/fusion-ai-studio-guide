@@ -265,57 +265,55 @@ JOBS.append(rowfig(
     "Let me be straight about who this is for.",
     [("01", "Anyone", "stops at: a validated file"),
      ("02", "Fusion Applications customers", "stops at: live for real users"),
-     ("03", "Everyone else", "stops at: the five rules")],
+     ("03", "Everyone else", "stops at: the six practices")],
     right_head="how far you get",
     foot="no Fusion environment needed to build and validate",
     label="Three audiences: anyone can clone the repo and build and validate files locally, "
           "Fusion Applications customers can publish to real users, and everyone else can take "
-          "the five rules."))
+          "the six practices."))
 
-JOBS.append(rowfig(
-    "09-five-rules-summary", 900, 448,
-    "the five rules",
-    [[("How you ship agents when ", INK), ("a wrong answer is not an option.", ACC)]],
-    [("01", "The spec comes first", "agree the plan in writing"),
-     ("02", "One gated write action", "it can look, not touch"),
-     ("03", "Discover before you build", "find what exists, protect it"),
-     ("04", "Structure over improvisation", "the model works inside fixed steps"),
-     ("05", "Unvalidated means unfinished", "done means the checks passed")],
-    right_head="in one line",
-    label="Summary of the five rules: the spec comes first, one gated write action, discover "
-          "before you build, structure over improvisation, unvalidated means unfinished."))
-
-# ════════════════════════════════════════════════════════ the five rule cards
+# ═══════════════════════════════════════════════════════ the six practice cards
 RULES = [
-    ("04-rule-01-spec-first", "01", [("The spec ", INK), ("comes first.", ACC)],
-     ["Nothing gets built until the plan is written down and you agree to it.",
-      "Two screens, three panels, four detail views, and an explicit list of",
-      "what it will not build yet."],
-     "the agent hands you a written plan and waits"),
-    ("05-rule-02-one-gated-write", "02", [("One gated ", INK), ("write action.", ACC)],
-     ["Out of the box the app can look, but never change anything. Click",
-      "around, dig in, ask questions — all read-only. The one action that",
-      "touches a real record has to be switched on by hand, and it asks first."],
-     "read-only by default, not by convention"),
-    ("06-rule-03-discover-first", "03", [("Discover ", INK), ("before you build.", ACC)],
-     ["The agent searches your files first, finds the workflows that already",
-      "exist, and reuses them. It only builds what is genuinely missing, and",
-      "it never edits or renames the rest."],
-     "the most expensive agent is the one that rebuilds what existed"),
-    ("07-rule-04-structure", "04", [("Structure over ", INK), ("improvisation.", ACC)],
-     ["Open one of these workflows and the agent is not making it up as it",
-      "goes. The steps are fixed: work out what was asked, go get the data,",
-      "let the model think, send back an answer."],
-     "and sixty seconds to finish"),
-    ("08-rule-05-unvalidated", "05", [("Unvalidated means ", INK), ("unfinished.", ACC)],
-     ["When the build finishes, the agent does not announce that it is done.",
-      "It runs the checks first. If the checks have not passed, the skill treats",
-      "the work as unfinished and fixes it before anything else."],
-     "your agent saying done is not proof — the checks passing is"),
+    ("04-practice-01-contract", "01",
+     [("Agree the contract ", INK), ("before any code.", ACC)],
+     ["Nothing gets built until the plan is written down and you agree to it:",
+      "the screens, the panels, and an explicit list of what it will not build",
+      "yet. Arguing with a paragraph is free. A generated build is a rebuild."],
+     "the agent hands you a written scope and waits"),
+    ("05-practice-02-read-only", "02",
+     [("Read-only until a human ", INK), ("opens the gate.", ACC)],
+     ["Out of the box the app can look but never change anything. Every action",
+      "that touches a real record is named, switched on by hand, and asks",
+      "before it fires."],
+     "least privilege as a default, not as a policy document"),
+    ("06-practice-03-discover", "03",
+     [("Discover first, and leave ", INK), ("what you find alone.", ACC)],
+     ["The agent searches the workspace first, finds what already exists, and",
+      "reuses it. It builds only what is genuinely missing, and never edits or",
+      "renames the rest, because other artifacts call those by name."],
+     "the most expensive agent rebuilds what already existed"),
+    ("07-practice-04-graph-or-loop", "04",
+     [("Graph the path you know. ", INK), ("Loop the one you do not.", ACC)],
+     ["A graph is fixed nodes and edges: same input, same path, and when it",
+      "breaks you know which node broke. A loop is the model choosing its next",
+      "action until it decides it is done: flexible, and prone to wandering."],
+     "the mistake is not picking wrong, it is not knowing which you are in"),
+    ("08-practice-05-loop-to-graph", "05",
+     [("Loop to learn, ", INK), ("graph to ship.", ACC)],
+     ["Explore in the loop where a human is watching, then freeze the path it",
+      "proved into a graph for production. Where one step stays open-ended, put",
+      "a bounded loop inside a single node, with a hard cap on iterations."],
+     "the graph owns control flow, the loop owns local judgement"),
+    ("09-practice-06-validated", "06",
+     [("Validation is the ", INK), ("definition of done.", ACC)],
+     ["When the build finishes the agent does not announce that it is done. It",
+      "runs the checks first, and if they have not passed it treats the work as",
+      "unfinished and fixes it before anything else."],
+     "done is a prediction; a check passing is evidence"),
 ]
 for name, num, title, body, foot in RULES:
     W, H = 900, 296
-    b = [eyebrow(PAD, 52, "enterprise agent rule")]
+    b = [eyebrow(PAD, 52, "agent engineering practice")]
     b.append(txt(PAD, 132, num, size=64, fill=RULE2, font=MONO, weight=600))
     b.append(rich(PAD + 118, 96, title, size=30, weight=700, ls="-0.6"))
     y = 140
@@ -325,7 +323,7 @@ for name, num, title, body, foot in RULES:
     b.append(line(PAD + 118, 226, W - PAD, 226))
     b.append(txt(PAD + 118, 252, foot, size=12, fill=DIM, font=MONO))
     JOBS.append(svg(name, W, H, "".join(b),
-                    label=f"Rule {num}: " + "".join(s for s, _ in title) + " " + " ".join(body)))
+                    label=f"Practice {num}: " + "".join(s for s, _ in title) + " " + " ".join(body)))
 
 # ════════════════════════════════════════════ 03 — what an agentic app is
 W, H = 900, 384
@@ -383,10 +381,10 @@ b.append(rich(PAD, 96, [("How you ship agents when", INK)], size=31, weight=700,
 b.append(rich(PAD, 134, [("a wrong answer is not an option.", ACC)], size=31, weight=700,
               ls="-0.7"))
 b.append(line(PAD, 176, W - PAD, 176))
-cols = [("01", ["Spec", "first"]), ("02", ["One gated", "write"]),
-        ("03", ["Discover", "first"]), ("04", ["Fixed", "structure"]),
-        ("05", ["Checks", "pass"])]
-cw = (W - 2 * PAD) / 5
+cols = [("01", ["Contract", "first"]), ("02", ["Read-only", "default"]),
+        ("03", ["Discover", "first"]), ("04", ["Graph or", "loop"]),
+        ("05", ["Loop then", "graph"]), ("06", ["Checks", "pass"])]
+cw = (W - 2 * PAD) / 6
 for i, (num, words) in enumerate(cols):
     x = PAD + i * cw
     if i:
@@ -400,10 +398,10 @@ b.append(line(PAD, 304, W - PAD, 304))
 b.append(txt(PAD, 340, "Not Oracle-specific.", size=15.5, fill=INK2, font=SERIF))
 b.append(txt(PAD + 152, 340, "Use them on whatever you build next.", size=15.5, fill=DIM,
              font=SERIF))
-JOBS.append(svg("34-five-rules-closing", W, H, "".join(b),
+JOBS.append(svg("34-practices-closing", W, H, "".join(b),
                 label="Closing summary: how you ship agents when a wrong answer is not an option "
-                      "— spec first, one gated write, discover first, fixed structure, checks "
-                      "pass. Not Oracle-specific."))
+                      "- contract first, read-only default, discover first, graph or loop, loop "
+                      "then graph, checks pass. Not Oracle-specific."))
 
 with open(os.path.join(OUT, "manifest.txt"), "w") as f:
     for name, w, h in JOBS:

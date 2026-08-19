@@ -19,7 +19,7 @@ step Oracle's guide does not mention — Claude Code reads skills from `.claude/
 
 | § | Section |
 | --- | --- |
-| 01–04 | What this actually is, who it is for, the five rules, prerequisites |
+| 01–04 | What this actually is, who it is for, the six practices, prerequisites |
 | 05 | **Setup, steps 1–10** — repo, workspace, VS Code extension, skills, Claude Code wiring, samples, auth (basic *and* IDCS OAuth), secrets, CLI check, `CLAUDE.md` |
 | 06 | **Your first build, steps 11–16** — one paragraph in, a validated and published agentic app out |
 | 07–10 | Every skill explained, slash commands, the full 288-command CLI map, agentic apps explained |
