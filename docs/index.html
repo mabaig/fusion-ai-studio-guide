@@ -10,7 +10,7 @@
 
 <link rel="canonical" href="https://mabaig.github.io/fusion-ai-studio-guide">
 <meta property="og:type" content="article">
-<meta property="article:author" content="https://github.com/mabaig">
+<meta property="article:author" content="https://www.linkedin.com/in/mbaig162/">
 <meta property="og:site_name" content="Oracle AI Agent Studio CLI + Claude Code">
 <meta property="og:title" content="Oracle Let the AI Write the Files. It Kept the Checks for Itself.">
 <meta property="og:description" content="Oracle put its own AI Agent Studio expertise in a public repo. Every step of driving it from Claude Code, including the one Oracle's guide leaves out.">
@@ -28,7 +28,7 @@
 {"@context":"https://schema.org","@type":"TechArticle",
  "headline":"Oracle Let the AI Write the Files. It Kept the Checks for Itself.",
  "description":"A step-by-step guide to the Oracle AI Agent Studio CLI running inside Claude Code, for Oracle Fusion release 26C.",
- "author":{"@type":"Person","name":"Baig Mohammed","url":"https://github.com/mabaig"},
+ "author":{"@type":"Person","name":"Baig Mohammed","url":"https://www.linkedin.com/in/mbaig162/"},
  "image":"https://mabaig.github.io/fusion-ai-studio-guide/social/og-card.png",
  "mainEntityOfPage":"https://mabaig.github.io/fusion-ai-studio-guide/",
  "about":["Oracle Fusion","Oracle AI Agent Studio","Claude Code"]}
@@ -169,20 +169,12 @@ h1{
   margin-top:2.5rem;font-family:var(--mono);font-size:.75rem;color:var(--muted);
   display:flex;flex-wrap:wrap;gap:.4rem 1.25rem;align-items:baseline;
 }
-.byline .who{
-  font-family:var(--display);font-size:.9375rem;font-weight:700;letter-spacing:-.01em;
-  color:var(--ink);
-}
-.byline .who a{color:var(--ink);border-bottom-color:color-mix(in srgb,var(--accent) 55%,transparent)}
-.byline .who a:hover{color:var(--accent)}
 
 /* ─── page footer ────────────────────────────────────────────────────── */
 .pagefoot{
   margin-top:4rem;padding-top:1.75rem;border-top:1px solid var(--rule-strong);
   display:grid;grid-template-columns:minmax(0,1fr) auto;gap:1.5rem 2rem;align-items:start;
 }
-.pagefoot .who{font-family:var(--display);font-size:1.0625rem;font-weight:700;letter-spacing:-.012em;margin:0 0 .35rem}
-.pagefoot .role{font-family:var(--mono);font-size:.75rem;color:var(--muted);margin:0 0 .6rem;line-height:1.6}
 .pagefoot .said{font-size:.9375rem;color:var(--ink-2);margin:0;max-width:52ch}
 .pagefoot .fl{font-family:var(--mono);font-size:.75rem;color:var(--muted);text-align:right;line-height:2}
 .pagefoot .fl a{display:block;border:0;color:var(--muted);text-decoration:underline;text-decoration-color:var(--rule-strong)}
@@ -456,7 +448,7 @@ figure img{transition:box-shadow .5s ease}
 <div class="cursor-aura" id="cursorAura" aria-hidden="true"></div>
 <div class="progress-rail" id="progressRail" aria-hidden="true"></div>
 
-<a class="credit" href="https://github.com/mabaig" title="Independent guide — not affiliated with Oracle">
+<a class="credit" href="https://www.linkedin.com/in/mbaig162/" rel="me noopener" title="Baig Mohammed on LinkedIn — independent guide, not affiliated with Oracle">
   <img src="img/oracle-mark.png" alt="">
   <span class="hide-xs" style="font-size:.6875rem"><b>Baig Mohammed</b><span>Independent &middot; not affiliated with Oracle</span></span>
 </a>
@@ -484,7 +476,6 @@ figure img{transition:box-shadow .5s ease}
   <div class="rail-foot">
     <p style="margin:0 0 .5rem">Tested against <code style="font-size:.9em">release-26C</code> · CLI <code style="font-size:.9em">1.0.1784919021375</code></p>
     <p style="margin:0 0 .5rem"><a href="https://github.com/oracle/fusion-ai-studio">oracle/fusion-ai-studio</a></p>
-    <p style="margin:0">by <a href="https://github.com/mabaig">Baig Mohammed</a></p>
     <button class="amb-toggle" id="ambToggle" type="button" aria-pressed="true">
       <span>Ambience</span><span class="sw"></span>
     </button>
@@ -499,7 +490,6 @@ figure img{transition:box-shadow .5s ease}
   <h1>Oracle Let the AI Write the Files. <br>It Kept the Checks for Itself.</h1>
   <p class="dek">Inside Fusion 26C&rsquo;s AI Agent Studio CLI &mdash; the boundary that makes agentic apps safe on real ERP data, and every step of driving it from Claude Code.</p>
   <p class="byline">
-    <span class="who">By <a href="https://github.com/mabaig">Baig Mohammed</a></span>
     <span>Step-by-step guide</span><span>~40 minutes of setup</span><span>No Fusion instance needed to follow along</span>
   </p>
 </header>
@@ -1773,8 +1763,6 @@ cp -R &lt;newly-unzipped&gt;/aistudio ~/fusion-ai-workspace/.agents/skills/
 
 <footer class="pagefoot">
   <div>
-    <p class="who">Baig Mohammed</p>
-    <p class="role">Oracle Fusion &amp; enterprise AI · <a href="https://github.com/mabaig">github.com/mabaig</a></p>
     <p class="said">I wrote this while working through the 26C CLI myself, on macOS, in Claude Code. Every figure is either a diagram drawn for this guide or a screenshot taken during that run &mdash; nothing here is borrowed.</p>
   </div>
   <div class="fl">
